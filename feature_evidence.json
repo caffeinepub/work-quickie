@@ -1,0 +1,25 @@
+{
+  "kind": "feature_evidence_report",
+  "features": [
+    {
+      "featureId": "feature-save-the-uploaded-work-quickie-logo-image-lightning-bolt-graphic-with-work-quickie-red-text-as-a-static-asset-at-frontend-public-assets-generated-work-quickie-logo-png-and-replace-any-existing-text-only-or-placeholder-logo-in-the-app-header-navbar-layout-tsx-and-the-landing-page-landingpage-tsx-with-this-image-the-logo-should-render-at-an-appropriate-size-e-g-height-40px-in-the-header-height-64px-on-the-landing-page-and-link-to-the-home-route",
+      "featureTitle": "Save the uploaded Work-Quickie logo image (lightning bolt graphic with 'Work-Quickie' red text) as a static asset at frontend/public/assets/generated/work-quickie-logo.png and replace any existing text-only or placeholder logo in the app header/navbar (Layout.tsx) and the landing page (LandingPage.tsx) with this image. The logo should render at an appropriate size (e.g., height 40px in the header, height 64px on the landing page) and link to the home route.",
+      "files": [
+        "frontend/src/components/LandingPage.tsx",
+        "frontend/src/components/Layout.tsx"
+      ],
+      "components": [
+        "authorization@4.0.0",
+        "core-infrastructure@1.0.2",
+        "shadcn-ui@1.0.0",
+        "build-template-react@1.0.0",
+        "initial-app@1.0.0",
+        "github-export-icp-cli@1.0.0"
+      ],
+      "testIds": [
+        "REQ-12"
+      ],
+      "confidence": "high"
+    }
+  ]
+}

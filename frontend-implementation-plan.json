@@ -1,0 +1,35 @@
+{
+  "kind": "implementation_plan",
+  "version": "1.0",
+  "title": "Apply Work-Quickie logo across the app",
+  "requirements": [
+    {
+      "id": "REQ-12",
+      "summary": "Replace text-only or placeholder logo with the uploaded Work-Quickie logo image in the app header and landing page",
+      "acceptanceCriteria": [
+        "The Work-Quickie logo image is saved at frontend/public/assets/generated/work-quickie-logo.png",
+        "The sticky header in Layout.tsx displays the logo image instead of any text-only or placeholder logo",
+        "The LandingPage.tsx hero section displays the logo image",
+        "The logo image in the header links to the home route ('/')",
+        "The logo renders clearly at appropriate sizes without distortion on both desktop and mobile"
+      ],
+      "file_operations": [
+        {
+          "path": "frontend/public/assets/generated/work-quickie-logo.png",
+          "operation": "create",
+          "description": "Save the uploaded Work-Quickie logo image (lightning bolt graphic with 'Work-Quickie' red text) as a static asset. This file will be referenced by Layout.tsx and LandingPage.tsx components."
+        },
+        {
+          "path": "frontend/src/components/Layout.tsx",
+          "operation": "modify",
+          "description": "Replace the existing text-only or placeholder logo in the sticky header with an <img> element that references frontend/public/assets/generated/work-quickie-logo.png. The logo should render at height 40px, be wrapped in a Link to '/', and include appropriate alt text. Ensure responsive sizing works correctly on mobile viewports."
+        },
+        {
+          "path": "frontend/src/components/LandingPage.tsx",
+          "operation": "modify",
+          "description": "Replace any existing text-only or placeholder logo in the hero section with an <img> element that references frontend/public/assets/generated/work-quickie-logo.png. The logo should render at height 64px with appropriate alt text and maintain aspect ratio without distortion on all screen sizes."
+        }
+      ]
+    }
+  ]
+}

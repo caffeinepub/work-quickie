@@ -1,0 +1,9 @@
+{
+  "frontend/src/pages/JobBoard.tsx": "Public job board page with search/filter controls (keyword, location, job type, skills, pay range) using a sidebar on desktop and a sheet drawer on mobile, displaying filtered job cards from the backend searchJobs API.",
+  "frontend/src/pages/JobDetailPage.tsx": "Job detail page showing full job information, employer profile, and an application form for authenticated seekers; handles duplicate application prevention, inactive job states, and role-based UI rendering.",
+  "frontend/src/pages/JobPostingForm.tsx": "Job posting/editing form for posters with fields for title, description, job type, location, pay, and required skills (tag input); supports both create and edit modes via route params.",
+  "frontend/src/pages/JobApplicantsView.tsx": "Poster-facing page listing all applicants for a specific job with seeker profile info, skills, cover message, accept/reject actions, and a rating form for accepted applicants.",
+  "frontend/src/pages/AdminDashboard.tsx": "Admin-only dashboard wrapped in AdminGuard showing platform analytics cards, paginated/searchable tables for job listings (with approve/remove), seekers, and posters (with verify action).",
+  "frontend/src/components/Layout.tsx": "App shell with sticky header, mobile nav, and footer; now displays the Work-Quickie logo image (`/assets/Work-Quickie1.png`) in both the header (h-10) and footer (h-8) instead of the previous icon+text placeholder.",
+  "frontend/src/components/LandingPage.tsx": "Public landing page with hero, stats, features, how-it-works, and CTA sections; now shows the Work-Quickie logo image in the hero section (h-20/h-24) and the CTA section (h-16) replacing the previous Briefcase icon."
+}

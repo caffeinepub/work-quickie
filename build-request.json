@@ -1,0 +1,40 @@
+{
+  "kind": "build_request",
+  "title": "Apply Work-Quickie logo across the app",
+  "projectName": "Work-Quickie",
+  "priority": "normal",
+  "requirements": [
+    {
+      "id": "REQ-12",
+      "text": "Save the uploaded Work-Quickie logo image (lightning bolt graphic with 'Work-Quickie' red text) as a static asset at frontend/public/assets/generated/work-quickie-logo.png and replace any existing text-only or placeholder logo in the app header/navbar (Layout.tsx) and the landing page (LandingPage.tsx) with this image. The logo should render at an appropriate size (e.g., height 40px in the header, height 64px on the landing page) and link to the home route.",
+      "target": "frontend",
+      "source": {
+        "messageIds": [
+          "msg-1"
+        ],
+        "quotes": [
+          "can you apply this logo as the logo"
+        ]
+      },
+      "acceptanceCriteria": [
+        "The Work-Quickie logo image is saved at frontend/public/assets/generated/work-quickie-logo.png",
+        "The sticky header in Layout.tsx displays the logo image instead of any text-only or placeholder logo",
+        "The LandingPage.tsx hero section displays the logo image",
+        "The logo image in the header links to the home route ('/')",
+        "The logo renders clearly at appropriate sizes without distortion on both desktop and mobile"
+      ]
+    }
+  ],
+  "constraints": [
+    "Do not modify files under frontend/src/hooks/ or frontend/src/components/ui/",
+    "Do not alter the backend"
+  ],
+  "nonGoals": [
+    "Changing the overall visual theme or color palette",
+    "Redesigning any page layout beyond replacing the logo element"
+  ],
+  "imageRequirements": {
+    "required": [],
+    "edits": []
+  }
+}
