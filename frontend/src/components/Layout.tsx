@@ -51,8 +51,8 @@ export default function Layout({ children }: LayoutProps) {
           {/* Logo */}
           <Link to="/" className="flex items-center group">
             <img
-              src="/assets/Work-Quickie1.png"
-              alt="Work-Quickie"
+              src="/assets/openj1.png"
+              alt="Open-Jobs"
               className="h-10 w-auto object-contain"
             />
           </Link>
@@ -190,22 +190,22 @@ export default function Layout({ children }: LayoutProps) {
           <div className="flex flex-col md:flex-row items-center justify-between gap-4">
             <div className="flex items-center">
               <img
-                src="/assets/Work-Quickie1.png"
-                alt="Work-Quickie"
+                src="/assets/openj1.png"
+                alt="Open-Jobs"
                 className="h-8 w-auto object-contain"
               />
             </div>
             <div className="flex flex-col sm:flex-row items-center gap-4 text-sm text-muted-foreground">
               <Link to="/jobs" className="hover:text-foreground transition-colors">Browse Jobs</Link>
               <span className="hidden sm:block">·</span>
-              <span>© {new Date().getFullYear()} Work-Quickie</span>
+              <span>© {new Date().getFullYear()} Open-Jobs</span>
               <span className="hidden sm:block">·</span>
               <span>
                 Built with{' '}
                 <span className="text-red-500">♥</span>{' '}
                 using{' '}
                 <a
-                  href={`https://caffeine.ai/?utm_source=Caffeine-footer&utm_medium=referral&utm_content=${encodeURIComponent(typeof window !== 'undefined' ? window.location.hostname : 'work-quickie')}`}
+                  href={`https://caffeine.ai/?utm_source=Caffeine-footer&utm_medium=referral&utm_content=${encodeURIComponent(typeof window !== 'undefined' ? window.location.hostname : 'open-jobs')}`}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="text-primary hover:underline font-medium"

@@ -24,7 +24,7 @@ export interface Application {
   'message' : string,
 }
 export interface JobFilter {
-  'jobType' : [] | [string],
+  'jobType' : [] | [JobType],
   'minPay' : [] | [bigint],
   'keyword' : [] | [string],
   'maxPay' : [] | [bigint],
@@ -37,12 +37,17 @@ export interface JobListing {
   'title' : string,
   'active' : boolean,
   'postedBy' : Principal,
-  'jobType' : string,
+  'jobType' : JobType,
   'description' : string,
   'timestamp' : bigint,
   'requiredSkills' : Array<string>,
   'location' : string,
 }
+export type JobType = { 'nysc' : null } |
+  { 'partTime' : null } |
+  { 'fullTime' : null } |
+  { 'artisan' : null } |
+  { 'shortTerm' : null };
 export interface PosterProfile {
   'id' : Principal,
   'verified' : boolean,
@@ -83,7 +88,7 @@ export interface _SERVICE {
   'applyToJob' : ActorMethod<[bigint, string], undefined>,
   'assignCallerUserRole' : ActorMethod<[Principal, UserRole], undefined>,
   'createJobListing' : ActorMethod<
-    [string, string, Array<string>, string, bigint, string],
+    [string, string, Array<string>, string, bigint, JobType],
     bigint
   >,
   'createPosterProfile' : ActorMethod<[string, string, string], undefined>,

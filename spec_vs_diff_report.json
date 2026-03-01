@@ -1,34 +1,59 @@
 {
   "kind": "spec_vs_diff_report",
   "version": "1.0",
-  "generatedAt": "2026-02-28T20:22:11.343Z",
-  "summary": "The diff modifies Layout.tsx and LandingPage.tsx to display a logo image, partially satisfying REQ-12. However, both files reference '/assets/Work-Quickie1.png' instead of the required path '/assets/generated/work-quickie-logo.png', and there is no evidence that the image file was added at frontend/public/assets/generated/work-quickie-logo.png. The header logo correctly links to '/' via a Link component, and sizes appear reasonable (h-10 in header, h-20/h-24 in hero). The core AC around the correct file path is not met.",
+  "generatedAt": "2026-03-01T08:56:02.972Z",
+  "summary": "The diff implements most of REQ-1 and REQ-2 successfully. Frontend labels are updated from 'Short-Time' to 'NYSC (Youth Corps)' in LandingPage, JobFilters, JobListingCard, JobDetailPage, AdminDashboard, and JobPostingForm. The backend main.mo defines a new #nysc variant and a migration module is added. However, residual 'shortTerm' references remain in frontend label maps displaying 'Short-Term', and the shortTerm variant still appears in both the backend enum and migration module alongside #nysc, meaning the old variant was not fully removed.",
   "missing_requirements": [
     {
-      "id": "REQ-12",
-      "requirement": "Save the Work-Quickie logo image as a static asset at frontend/public/assets/generated/work-quickie-logo.png",
-      "reason": "No file was added at frontend/public/assets/generated/work-quickie-logo.png. The diff shows 0 added files and both Layout.tsx and LandingPage.tsx reference '/assets/Work-Quickie1.png' instead of '/assets/generated/work-quickie-logo.png'.",
+      "id": "REQ-2",
+      "requirement": "The backend no longer defines or accepts a 'ShortTime' job type variant.",
+      "reason": "The backend main.mo JobType enum still includes #shortTerm alongside #nysc. The migration module also defines NewJobType with both #shortTerm and #nysc variants. The old short-term variant was not removed, only a new #nysc variant was added alongside it.",
       "evidence": [
-        "frontend/src/components/Layout.tsx",
-        "frontend/src/components/LandingPage.tsx"
+        "backend/main.mo",
+        "backend/migration.mo"
+      ]
+    },
+    {
+      "id": "REQ-1",
+      "requirement": "The label 'Short-Time' no longer appears anywhere in the UI.",
+      "reason": "Frontend JOB_TYPE_LABELS maps in JobListingCard.tsx, JobDetailPage.tsx, and AdminDashboard.tsx still include a 'shortTerm: Short-Term' entry. While 'Short-Time' is replaced, 'Short-Term' remains as a displayable label for the shortTerm job type and could still appear in the UI.",
+      "evidence": [
+        "frontend/src/components/JobListingCard.tsx",
+        "frontend/src/pages/JobDetailPage.tsx",
+        "frontend/src/pages/AdminDashboard.tsx"
       ]
     }
   ],
   "hallucinated_features": [
     {
-      "description": "Logo image is referenced from '/assets/Work-Quickie1.png' instead of the specified '/assets/generated/work-quickie-logo.png'",
-      "reason": "The build request explicitly requires the asset path to be frontend/public/assets/generated/work-quickie-logo.png, but the implementation uses a different, unrequested path '/assets/Work-Quickie1.png'.",
+      "description": "A migration module (backend/migration.mo) was added to handle data migration from old text-based job types to the new enum variants, and main.mo applies it via (with migration = Migration.run).",
+      "reason": "The build request explicitly states as a non-goal: 'Migrating or transforming existing job listing data stored in the backend canister.' The migration.mo file and its invocation in main.mo implement exactly this non-goal.",
       "evidence": [
-        "frontend/src/components/Layout.tsx",
-        "frontend/src/components/LandingPage.tsx"
+        "backend/migration.mo",
+        "backend/main.mo"
+      ]
+    },
+    {
+      "description": "A new #shortTerm variant was retained in the backend JobType enum alongside #nysc, making it a distinct separate job type.",
+      "reason": "The build request asked only to rename ShortTime to NYSC while preserving other existing categories. Keeping shortTerm as a separate variant alongside nysc goes beyond a simple rename and contradicts REQ-2's requirement to remove the ShortTime variant.",
+      "evidence": [
+        "backend/main.mo",
+        "backend/migration.mo"
       ]
     }
   ],
-  "confidence": 0.9,
+  "confidence": 0.78,
   "changed_files": [
+    "backend/main.mo",
+    "backend/migration.mo",
     "frontend-file-summaries.txt",
+    "frontend/src/components/JobFilters.tsx",
+    "frontend/src/components/JobListingCard.tsx",
     "frontend/src/components/LandingPage.tsx",
-    "frontend/src/components/Layout.tsx",
+    "frontend/src/hooks/useQueries.ts",
+    "frontend/src/pages/AdminDashboard.tsx",
+    "frontend/src/pages/JobDetailPage.tsx",
+    "frontend/src/pages/JobPostingForm.tsx",
     "project_state.json"
   ]
 }

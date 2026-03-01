@@ -1,86 +1,16 @@
 {
   "schemaVersion": "1.0.0",
-  "projectStateVersion": 5,
-  "summary": "Work-Quickie is a web-based job marketplace app connecting job seekers with individuals or companies posting jobs. Built with React + TypeScript frontend and Motoko backend. Features include job seeker/employer profiles, job posting and browsing, search and filtering, ratings and reviews, Stripe payment integration, and an admin dashboard.",
-  "architectural_notes": [
-    "Frontend: React + TypeScript (web, not React Native)",
-    "Backend: Motoko (not Node.js or Firebase)",
-    "Auth: Internet Identity",
-    "Payments: Stripe integration with escrow support",
-    "No support for Google Maps, AdMob, WebSockets, push notifications, or Firebase"
-  ],
+  "projectStateVersion": 3,
+  "summary": "Project involves a multi-section app (with sections like Artisan, NYSC/Youth Corps, etc.). User is updating section labels.",
+  "architectural_notes": [],
   "known_issues": [],
   "isFixRequest": false,
   "existing_features": [
     {
-      "id": "feature-build-a-react-typescript-frontend-with-internet-identity-authentication-on-login-detect-whether-the-user-has-a-seeker-profile-poster-profile-or-neither-and-route-them-to-the-appropriate-onboarding-or-dashboard-screen",
-      "title": "Build a React + TypeScript frontend with Internet Identity authentication. On login, detect whether the user has a seeker profile, poster profile, or neither, and route them to the appropriate onboarding or dashboard screen.",
+      "id": "feature-replace-all-occurrences-of-the-job-type-label-short-time-with-nysc-youth-corps-across-the-entire-frontend-including-job-type-badges-filter-dropdowns-selection-options-and-any-display-text-where-short-time-appears-as-a-job-category-or-section-label",
+      "title": "Replace all occurrences of the job type label 'Short-Time' with 'NYSC (Youth Corps)' across the entire frontend, including job type badges, filter dropdowns, selection options, and any display text where 'Short-Time' appears as a job category or section label.",
       "reqIds": [
-        "REQ-4"
-      ],
-      "version": 1
-    },
-    {
-      "id": "feature-build-a-job-seeker-profile-creation-and-edit-form-with-fields-for-full-name-bio-skills-multi-tag-input-qualifications-work-experience-entries-portfolio-url-and-availability-toggle-display-the-seeker-s-profile-page-with-all-information-and-their-submitted-applications-with-statuses",
-      "title": "Build a Job Seeker profile creation and edit form with fields for: full name, bio, skills (multi-tag input), qualifications, work experience entries, portfolio URL, and availability toggle. Display the seeker's profile page with all information and their submitted applications with statuses.",
-      "reqIds": [
-        "REQ-5"
-      ],
-      "version": 1
-    },
-    {
-      "id": "feature-build-a-job-poster-profile-creation-and-edit-form-with-fields-for-name-company-name-and-contact-info-build-a-job-posting-form-with-fields-for-title-description-required-skills-multi-tag-location-pay-budget-and-job-type-selector-full-time-part-time-short-term-artisan-display-the-poster-s-dashboard-listing-all-their-posted-jobs-with-applicant-counts-and-status",
-      "title": "Build a Job Poster profile creation and edit form with fields for: name, company name, and contact info. Build a job posting form with fields for: title, description, required skills (multi-tag), location, pay/budget, and job type selector (full-time, part-time, short-term, artisan). Display the poster's dashboard listing all their posted jobs with applicant counts and status.",
-      "reqIds": [
-        "REQ-6"
-      ],
-      "version": 1
-    },
-    {
-      "id": "feature-build-a-public-job-board-page-with-search-and-filter-controls-keyword-search-skill-filter-multi-select-job-type-filter-pay-range-slider-and-location-text-filter-display-matching-job-cards-with-title-company-location-pay-job-type-and-required-skills-each-card-links-to-a-job-detail-page-where-a-seeker-can-apply-with-an-optional-message",
-      "title": "Build a public job board page with search and filter controls: keyword search, skill filter (multi-select), job type filter, pay range slider, and location text filter. Display matching job cards with title, company, location, pay, job type, and required skills. Each card links to a job detail page where a seeker can apply with an optional message.",
-      "reqIds": [
-        "REQ-7"
-      ],
-      "version": 1
-    },
-    {
-      "id": "feature-build-a-recommended-jobs-section-on-the-seeker-dashboard-that-calls-the-backend-matching-function-and-displays-the-top-matched-job-listings-for-the-logged-in-seeker-based-on-their-skills",
-      "title": "Build a 'Recommended Jobs' section on the seeker dashboard that calls the backend matching function and displays the top-matched job listings for the logged-in seeker based on their skills.",
-      "reqIds": [
-        "REQ-8"
-      ],
-      "version": 1
-    },
-    {
-      "id": "feature-build-a-ratings-and-reviews-ui-after-a-job-application-is-marked-accepted-completed-both-the-seeker-and-poster-can-leave-a-rating-1-5-stars-and-written-review-for-the-other-party-display-average-rating-and-review-count-on-both-seeker-and-poster-profile-pages",
-      "title": "Build a ratings and reviews UI: after a job application is marked accepted/completed, both the seeker and poster can leave a rating (1–5 stars) and written review for the other party. Display average rating and review count on both seeker and poster profile pages.",
-      "reqIds": [
-        "REQ-9"
-      ],
-      "version": 1
-    },
-    {
-      "id": "feature-build-an-admin-dashboard-page-accessible-only-to-a-designated-admin-principal-it-should-display-total-users-seekers-and-posters-total-job-listings-total-applications-average-platform-rating-a-paginated-user-list-a-paginated-job-list-with-approve-remove-actions",
-      "title": "Build an Admin Dashboard page accessible only to a designated admin principal. It should display: total users (seekers and posters), total job listings, total applications, average platform rating, a paginated user list, a paginated job list with approve/remove actions.",
-      "reqIds": [
-        "REQ-10"
-      ],
-      "version": 1
-    },
-    {
-      "id": "feature-apply-a-cohesive-visual-theme-across-the-entire-app-use-a-warm-professional-color-palette-e-g-deep-teal-and-warm-amber-gold-accents-with-clean-sans-serif-typography-card-based-layouts-and-subtle-shadow-depth-effects-the-style-should-feel-modern-approachable-and-trustworthy-for-a-job-marketplace-audience",
-      "title": "Apply a cohesive visual theme across the entire app: use a warm, professional color palette (e.g., deep teal and warm amber/gold accents) with clean sans-serif typography, card-based layouts, and subtle shadow/depth effects. The style should feel modern, approachable, and trustworthy for a job marketplace audience.",
-      "reqIds": [
-        "REQ-11"
-      ],
-      "version": 1
-    },
-    {
-      "id": "feature-save-the-uploaded-work-quickie-logo-image-lightning-bolt-graphic-with-work-quickie-red-text-as-a-static-asset-at-frontend-public-assets-generated-work-quickie-logo-png-and-replace-any-existing-text-only-or-placeholder-logo-in-the-app-header-navbar-layout-tsx-and-the-landing-page-landingpage-tsx-with-this-image-the-logo-should-render-at-an-appropriate-size-e-g-height-40px-in-the-header-height-64px-on-the-landing-page-and-link-to-the-home-route",
-      "title": "Save the uploaded Work-Quickie logo image (lightning bolt graphic with 'Work-Quickie' red text) as a static asset at frontend/public/assets/generated/work-quickie-logo.png and replace any existing text-only or placeholder logo in the app header/navbar (Layout.tsx) and the landing page (LandingPage.tsx) with this image. The logo should render at an appropriate size (e.g., height 40px in the header, height 64px on the landing page) and link to the home route.",
-      "reqIds": [
-        "REQ-12"
+        "REQ-1"
       ],
       "version": 1
     }
@@ -88,73 +18,21 @@
   "new_feature_requests": [
     {
       "id": "AR-1",
-      "summary": "Job seeker profile creation with skills, qualifications, experience, portfolio, and availability",
-      "reqIds": [],
-      "status": "pending"
-    },
-    {
-      "id": "AR-2",
-      "summary": "Job poster (individual/company) profile and job posting with title, description, skills, location, pay, and job type",
+      "summary": "Replace 'Short-Time' section with 'NYSC (Youth Corps)' section",
       "reqIds": [],
       "status": "pending"
     },
     {
       "id": "AR-3",
-      "summary": "Job matching algorithm based on skills, experience, and location",
-      "reqIds": [],
-      "status": "pending"
-    },
-    {
-      "id": "AR-4",
-      "summary": "Search and filtering for jobs by category, skill, location, pay range, and type; workers searchable by skills, ratings, availability",
-      "reqIds": [],
-      "status": "pending"
-    },
-    {
-      "id": "AR-5",
-      "summary": "Stripe payment integration with escrow system for short-term/artisan jobs",
-      "reqIds": [],
-      "status": "pending"
-    },
-    {
-      "id": "AR-6",
-      "summary": "Ratings and reviews for workers and employers",
-      "reqIds": [],
-      "status": "pending"
-    },
-    {
-      "id": "AR-7",
-      "summary": "Admin dashboard for managing users, jobs, payments, and analytics",
-      "reqIds": [],
-      "status": "pending"
-    },
-    {
-      "id": "AR-8",
-      "summary": "Create a Motoko backend actor with data models and CRUD operations for: Job Seekers (name, bio, skills, qualifications, experience, portfolio URL, availability status), Job Posters (name, company name, contact info, verified status), Job Listings (title, description, required skills, location, pay/budget, job type: full-time/part-time/short-term/artisan, posted by, timestamp, status), Applications (job ID, seeker ID, message, status: pending/accepted/rejected), and Ratings (reviewer ID, reviewee ID, score 1-5, comment, timestamp).",
-      "reqIds": [
-        "REQ-1"
-      ],
-      "status": "pending"
-    },
-    {
-      "id": "AR-9",
-      "summary": "Implement a job matching and search/filtering backend API: return jobs filtered by keyword, skill tags, location string, pay range (min/max), and job type. Implement a basic matching function that scores and ranks job listings for a given seeker based on overlap between seeker skills and job required skills, plus optional location string match.",
+      "summary": "Update the backend job type enum or variant in main.mo to rename the 'ShortTime' (or equivalent) variant to 'NYSC' (or 'YouthCorps'), ensuring all related backend functions, filters, and data handling reflect the new type name.",
       "reqIds": [
         "REQ-2"
-      ],
-      "status": "pending"
-    },
-    {
-      "id": "AR-10",
-      "summary": "Implement an admin backend API with functions to: list all users (seekers and posters), list all job postings with status, approve or remove a job posting, view aggregate analytics (total users, total jobs posted, total applications, average rating).",
-      "reqIds": [
-        "REQ-3"
       ],
       "status": "pending"
     }
   ],
   "gameProjectType": "none",
-  "projectName": "Work-Quickie",
+  "projectName": "Open Jobs",
   "clarification_mode": "instant",
   "clarification_rounds": 0
 }

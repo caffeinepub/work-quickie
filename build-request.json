@@ -1,37 +1,56 @@
 {
   "kind": "build_request",
-  "title": "Apply Work-Quickie logo across the app",
-  "projectName": "Work-Quickie",
+  "title": "Replace 'Short-Time' with 'NYSC (Youth Corps)' section",
+  "projectName": "Open Jobs",
   "priority": "normal",
   "requirements": [
     {
-      "id": "REQ-12",
-      "text": "Save the uploaded Work-Quickie logo image (lightning bolt graphic with 'Work-Quickie' red text) as a static asset at frontend/public/assets/generated/work-quickie-logo.png and replace any existing text-only or placeholder logo in the app header/navbar (Layout.tsx) and the landing page (LandingPage.tsx) with this image. The logo should render at an appropriate size (e.g., height 40px in the header, height 64px on the landing page) and link to the home route.",
+      "id": "REQ-1",
+      "text": "Replace all occurrences of the job type label 'Short-Time' with 'NYSC (Youth Corps)' across the entire frontend, including job type badges, filter dropdowns, selection options, and any display text where 'Short-Time' appears as a job category or section label.",
       "target": "frontend",
       "source": {
         "messageIds": [
-          "msg-1"
+          "msg-9"
         ],
         "quotes": [
-          "can you apply this logo as the logo"
+          "replace Short-Time with NYSC (Youth Corps)"
         ]
       },
       "acceptanceCriteria": [
-        "The Work-Quickie logo image is saved at frontend/public/assets/generated/work-quickie-logo.png",
-        "The sticky header in Layout.tsx displays the logo image instead of any text-only or placeholder logo",
-        "The LandingPage.tsx hero section displays the logo image",
-        "The logo image in the header links to the home route ('/')",
-        "The logo renders clearly at appropriate sizes without distortion on both desktop and mobile"
+        "The label 'Short-Time' no longer appears anywhere in the UI.",
+        "The label 'NYSC (Youth Corps)' appears in all places where 'Short-Time' previously appeared, including job type badges on LandingPage.tsx, filter dropdowns in JobFilters.tsx, and type selectors in JobPostingForm.tsx.",
+        "Job listings previously categorized as 'Short-Time' now display as 'NYSC (Youth Corps)'.",
+        "The visual styling and layout of the replaced label matches the style of the other job type labels (e.g., Artisan)."
+      ]
+    },
+    {
+      "id": "REQ-2",
+      "text": "Update the backend job type enum or variant in main.mo to rename the 'ShortTime' (or equivalent) variant to 'NYSC' (or 'YouthCorps'), ensuring all related backend functions, filters, and data handling reflect the new type name.",
+      "target": "backend",
+      "source": {
+        "messageIds": [
+          "msg-9"
+        ],
+        "quotes": [
+          "replace Short-Time with NYSC (Youth Corps)"
+        ]
+      },
+      "acceptanceCriteria": [
+        "The backend no longer defines or accepts a 'ShortTime' job type variant.",
+        "A new 'NYSC' (or equivalent) job type variant is defined and accepted by the backend.",
+        "All backend query and filter functions that previously handled 'ShortTime' correctly handle the new 'NYSC' type.",
+        "The frontend's job type value sent to and received from the backend matches the updated backend variant name."
       ]
     }
   ],
   "constraints": [
-    "Do not modify files under frontend/src/hooks/ or frontend/src/components/ui/",
-    "Do not alter the backend"
+    "Do not modify files under frontend/src/hooks/useInternetIdentity.ts, frontend/src/hooks/useActor.ts, frontend/src/main.tsx, or frontend/src/components/ui.",
+    "Preserve all other existing job type categories (e.g., Artisan, Full-Time, Part-Time) unchanged."
   ],
   "nonGoals": [
-    "Changing the overall visual theme or color palette",
-    "Redesigning any page layout beyond replacing the logo element"
+    "Adding any new job type categories beyond renaming Short-Time to NYSC (Youth Corps).",
+    "Changing the visual design or layout of the job type section.",
+    "Migrating or transforming existing job listing data stored in the backend canister."
   ],
   "imageRequirements": {
     "required": [],

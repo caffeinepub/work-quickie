@@ -1,11 +1,12 @@
 # Specification
 
 ## Summary
-**Goal:** Replace the existing placeholder/text logo in the app with the uploaded Work-Quickie logo image (lightning bolt graphic with red "Work-Quickie" text).
+**Goal:** Replace the "Short-Time" job type label with "NYSC (Youth Corps)" across the entire application (frontend and backend).
 
 **Planned changes:**
-- Save the uploaded Work-Quickie logo as a static asset at `frontend/public/assets/generated/work-quickie-logo.png`
-- Replace any text-only or placeholder logo in the header/navbar (`Layout.tsx`) with the logo image at ~40px height, linking to the home route
-- Replace any text-only or placeholder logo in the landing page hero section (`LandingPage.tsx`) with the logo image at ~64px height
+- Replace all frontend occurrences of "Short-Time" with "NYSC (Youth Corps)" in job type badges, filter dropdowns, and job posting form type selectors
+- Rename the backend `ShortTime` job type variant to `NYSC` (or equivalent) in the Motoko canister
+- Update all backend functions and filters that reference the old `ShortTime` variant to use the new name
+- Ensure the frontend job type value sent to and received from the backend matches the updated backend variant
 
-**User-visible outcome:** The Work-Quickie logo image appears in both the sticky header and the landing page hero section, replacing any previous text or placeholder logo.
+**User-visible outcome:** Users will see "NYSC (Youth Corps)" everywhere "Short-Time" previously appeared, including job listings, filters, and posting forms, while all other job types remain unchanged.

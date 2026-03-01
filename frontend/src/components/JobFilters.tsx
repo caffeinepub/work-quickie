@@ -5,12 +5,13 @@ import { Slider } from '@/components/ui/slider';
 import { Button } from '@/components/ui/button';
 import { Search, X } from 'lucide-react';
 import TagInput from './TagInput';
+import { JobType } from '../backend';
 
 export interface FilterState {
   keyword: string;
   skills: string[];
   location: string;
-  jobType: string;
+  jobType: JobType | '';
   minPay: number;
   maxPay: number;
 }
@@ -70,16 +71,19 @@ export default function JobFilters({ filters, onChange, onReset }: JobFiltersPro
       {/* Job Type */}
       <div className="space-y-1.5">
         <Label className="text-xs font-medium text-muted-foreground uppercase tracking-wide">Job Type</Label>
-        <Select value={filters.jobType} onValueChange={(v) => update({ jobType: v === 'all' ? '' : v })}>
+        <Select
+          value={filters.jobType}
+          onValueChange={(v) => update({ jobType: v === 'all' ? '' : (v as JobType) })}
+        >
           <SelectTrigger>
             <SelectValue placeholder="All types" />
           </SelectTrigger>
           <SelectContent>
             <SelectItem value="all">All Types</SelectItem>
-            <SelectItem value="FullTime">Full-Time</SelectItem>
-            <SelectItem value="PartTime">Part-Time</SelectItem>
-            <SelectItem value="ShortTerm">Short-Term</SelectItem>
-            <SelectItem value="Artisan">Artisan</SelectItem>
+            <SelectItem value={JobType.fullTime}>Full-Time</SelectItem>
+            <SelectItem value={JobType.partTime}>Part-Time</SelectItem>
+            <SelectItem value={JobType.nysc}>NYSC (Youth Corps)</SelectItem>
+            <SelectItem value={JobType.artisan}>Artisan</SelectItem>
           </SelectContent>
         </Select>
       </div>

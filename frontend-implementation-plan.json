@@ -1,33 +1,62 @@
 {
   "kind": "implementation_plan",
   "version": "1.0",
-  "title": "Apply Work-Quickie logo across the app",
+  "title": "Replace 'Short-Time' with 'NYSC (Youth Corps)' section",
   "requirements": [
     {
-      "id": "REQ-12",
-      "summary": "Replace text-only or placeholder logo with the uploaded Work-Quickie logo image in the app header and landing page",
+      "id": "REQ-1",
+      "summary": "Replace all occurrences of the job type label 'Short-Time' with 'NYSC (Youth Corps)' across the entire frontend, including job type badges, filter dropdowns, selection options, and any display text where 'Short-Time' appears as a job category or section label.",
       "acceptanceCriteria": [
-        "The Work-Quickie logo image is saved at frontend/public/assets/generated/work-quickie-logo.png",
-        "The sticky header in Layout.tsx displays the logo image instead of any text-only or placeholder logo",
-        "The LandingPage.tsx hero section displays the logo image",
-        "The logo image in the header links to the home route ('/')",
-        "The logo renders clearly at appropriate sizes without distortion on both desktop and mobile"
+        "The label 'Short-Time' no longer appears anywhere in the UI.",
+        "The label 'NYSC (Youth Corps)' appears in all places where 'Short-Time' previously appeared, including job type badges on LandingPage.tsx, filter dropdowns in JobFilters.tsx, and type selectors in JobPostingForm.tsx.",
+        "Job listings previously categorized as 'Short-Time' now display as 'NYSC (Youth Corps)'.",
+        "The visual styling and layout of the replaced label matches the style of the other job type labels (e.g., Artisan)."
       ],
       "file_operations": [
         {
-          "path": "frontend/public/assets/generated/work-quickie-logo.png",
-          "operation": "create",
-          "description": "Save the uploaded Work-Quickie logo image (lightning bolt graphic with 'Work-Quickie' red text) as a static asset. This file will be referenced by Layout.tsx and LandingPage.tsx components."
-        },
-        {
-          "path": "frontend/src/components/Layout.tsx",
-          "operation": "modify",
-          "description": "Replace the existing text-only or placeholder logo in the sticky header with an <img> element that references frontend/public/assets/generated/work-quickie-logo.png. The logo should render at height 40px, be wrapped in a Link to '/', and include appropriate alt text. Ensure responsive sizing works correctly on mobile viewports."
-        },
-        {
           "path": "frontend/src/components/LandingPage.tsx",
           "operation": "modify",
-          "description": "Replace any existing text-only or placeholder logo in the hero section with an <img> element that references frontend/public/assets/generated/work-quickie-logo.png. The logo should render at height 64px with appropriate alt text and maintain aspect ratio without distortion on all screen sizes."
+          "description": "Update the job type badge display in the hero section to replace 'Short-Time' with 'NYSC (Youth Corps)', ensuring the label and associated icon reflect the new category name while maintaining consistent styling with other job type badges."
+        },
+        {
+          "path": "frontend/src/components/JobFilters.tsx",
+          "operation": "modify",
+          "description": "Update the job type select dropdown options to replace 'Short-Time' with 'NYSC (Youth Corps)', ensuring the value sent to the backend matches the updated JobType enum variant 'nysc' and the display text shows 'NYSC (Youth Corps)'."
+        },
+        {
+          "path": "frontend/src/pages/JobPostingForm.tsx",
+          "operation": "modify",
+          "description": "Update the job type selector in the job posting form to replace 'Short-Time' with 'NYSC (Youth Corps)' in the dropdown options, ensuring the form sends the correct 'nysc' value to the backend when this type is selected."
+        },
+        {
+          "path": "frontend/src/components/JobListingCard.tsx",
+          "operation": "modify",
+          "description": "Update the job type badge rendering logic to display 'NYSC (Youth Corps)' instead of 'Short-Time' when the job type is 'nysc', maintaining consistent badge styling and color with other job type categories."
+        },
+        {
+          "path": "frontend/src/pages/JobBoard.tsx",
+          "operation": "modify",
+          "description": "Review and update any job type display logic or filtering UI elements in the job board to ensure 'NYSC (Youth Corps)' is consistently displayed instead of 'Short-Time' for the 'nysc' job type."
+        },
+        {
+          "path": "frontend/src/pages/JobDetailPage.tsx",
+          "operation": "modify",
+          "description": "Update the job type display in the job detail view to show 'NYSC (Youth Corps)' instead of 'Short-Time' when rendering job listing details for 'nysc' type jobs."
+        },
+        {
+          "path": "frontend/src/pages/PosterDashboard.tsx",
+          "operation": "modify",
+          "description": "Update any job type display or filtering logic in the poster dashboard to show 'NYSC (Youth Corps)' instead of 'Short-Time' for 'nysc' type job listings."
+        },
+        {
+          "path": "frontend/src/pages/SeekerDashboard.tsx",
+          "operation": "modify",
+          "description": "Update any job type display or matched job filtering UI in the seeker dashboard to show 'NYSC (Youth Corps)' instead of 'Short-Time' for 'nysc' type jobs."
+        },
+        {
+          "path": "frontend/src/pages/AdminDashboard.tsx",
+          "operation": "modify",
+          "description": "Update the job type display in the admin job listings table to show 'NYSC (Youth Corps)' instead of 'Short-Time' for 'nysc' type jobs, ensuring consistency across the admin interface."
         }
       ]
     }

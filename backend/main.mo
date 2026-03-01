@@ -12,7 +12,10 @@ import Principal "mo:core/Principal";
 
 import MixinAuthorization "authorization/MixinAuthorization";
 import AccessControl "authorization/access-control";
+import Migration "migration";
 
+// Open-Jobs
+(with migration = Migration.run)
 actor {
   // Types
   public type UserProfile = {
@@ -39,6 +42,14 @@ actor {
     verified : Bool;
   };
 
+  public type JobType = {
+    #fullTime;
+    #partTime;
+    #shortTerm;
+    #artisan;
+    #nysc;
+  };
+
   public type JobListing = {
     id : Nat;
     title : Text;
@@ -46,7 +57,7 @@ actor {
     requiredSkills : [Text];
     location : Text;
     pay : Nat;
-    jobType : Text; // "FullTime", "PartTime", "ShortTerm", "Artisan"
+    jobType : JobType;
     postedBy : Principal;
     timestamp : Int;
     active : Bool;
@@ -81,7 +92,7 @@ actor {
     location : ?Text;
     minPay : ?Nat;
     maxPay : ?Nat;
-    jobType : ?Text;
+    jobType : ?JobType;
   };
 
   // State
@@ -197,7 +208,7 @@ actor {
     requiredSkills : [Text],
     location : Text,
     pay : Nat,
-    jobType : Text,
+    jobType : JobType,
   ) : async Nat {
     if (not AccessControl.hasPermission(accessControlState, caller, #user)) {
       Runtime.trap("Only authenticated users can create job listings");
@@ -280,7 +291,7 @@ actor {
       switch (filter.jobType) {
         case (null) { () };
         case (?jt) {
-          matches := matches and Text.equal(job.jobType, jt);
+          matches := matches and job.jobType == jt;
         };
       };
       matches;

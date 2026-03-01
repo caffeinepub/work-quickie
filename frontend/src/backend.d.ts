@@ -28,7 +28,7 @@ export interface Analytics {
     totalApplications: bigint;
 }
 export interface JobFilter {
-    jobType?: string;
+    jobType?: JobType;
     minPay?: bigint;
     keyword?: string;
     maxPay?: bigint;
@@ -51,7 +51,7 @@ export interface JobListing {
     title: string;
     active: boolean;
     postedBy: Principal;
-    jobType: string;
+    jobType: JobType;
     description: string;
     timestamp: bigint;
     requiredSkills: Array<string>;
@@ -68,6 +68,13 @@ export interface UserProfile {
     name: string;
     role: string;
 }
+export enum JobType {
+    nysc = "nysc",
+    partTime = "partTime",
+    fullTime = "fullTime",
+    artisan = "artisan",
+    shortTerm = "shortTerm"
+}
 export enum UserRole {
     admin = "admin",
     user = "user",
@@ -83,7 +90,7 @@ export interface backendInterface {
     adminVerifyPoster(posterId: Principal): Promise<void>;
     applyToJob(jobId: bigint, message: string): Promise<void>;
     assignCallerUserRole(user: Principal, role: UserRole): Promise<void>;
-    createJobListing(title: string, description: string, requiredSkills: Array<string>, location: string, pay: bigint, jobType: string): Promise<bigint>;
+    createJobListing(title: string, description: string, requiredSkills: Array<string>, location: string, pay: bigint, jobType: JobType): Promise<bigint>;
     createPosterProfile(name: string, companyName: string, contactInfo: string): Promise<void>;
     createSeekerProfile(name: string, bio: string, skills: Array<string>, qualifications: Array<string>, experience: string, portfolioUrl: string): Promise<void>;
     getApplicationsForJob(jobId: bigint): Promise<Array<Application>>;

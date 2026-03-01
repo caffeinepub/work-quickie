@@ -14,17 +14,19 @@ interface JobListingCardProps {
 }
 
 const JOB_TYPE_LABELS: Record<string, string> = {
-  FullTime: 'Full-Time',
-  PartTime: 'Part-Time',
-  ShortTerm: 'Short-Term',
-  Artisan: 'Artisan',
+  fullTime: 'Full-Time',
+  partTime: 'Part-Time',
+  nysc: 'NYSC (Youth Corps)',
+  artisan: 'Artisan',
+  shortTerm: 'Short-Term',
 };
 
 const JOB_TYPE_COLORS: Record<string, string> = {
-  FullTime: 'bg-primary/10 text-primary',
-  PartTime: 'bg-blue-100 text-blue-700',
-  ShortTerm: 'bg-amber-100 text-amber-700',
-  Artisan: 'bg-purple-100 text-purple-700',
+  fullTime: 'bg-primary/10 text-primary',
+  partTime: 'bg-blue-100 text-blue-700',
+  nysc: 'bg-amber-100 text-amber-700',
+  artisan: 'bg-purple-100 text-purple-700',
+  shortTerm: 'bg-amber-100 text-amber-700',
 };
 
 export default function JobListingCard({

@@ -29,7 +29,7 @@ export default function LandingPage() {
     },
   ];
 
-  const jobTypes = ['Full-Time', 'Part-Time', 'Short-Term', 'Artisan'];
+  const jobTypes = ['Full-Time', 'Part-Time', 'NYSC (Youth Corps)', 'Artisan'];
 
   return (
     <div className="flex flex-col">
@@ -48,8 +48,8 @@ export default function LandingPage() {
             {/* Logo in hero */}
             <div className="mb-6">
               <img
-                src="/assets/Work-Quickie1.png"
-                alt="Work-Quickie"
+                src="/assets/openj1.png"
+                alt="Open-Jobs"
                 className="h-20 md:h-24 w-auto object-contain drop-shadow-lg"
               />
             </div>
@@ -59,8 +59,8 @@ export default function LandingPage() {
               Fast
             </h1>
             <p className="text-lg text-white/80 mb-8 leading-relaxed">
-              Work-Quickie connects skilled professionals with employers posting full-time, part-time,
-              short-term, and artisan jobs. Get matched instantly based on your skills.
+              Open-Jobs connects skilled professionals with employers posting full-time, part-time,
+              NYSC, and artisan jobs. Get matched instantly based on your skills.
             </p>
             <div className="flex flex-col sm:flex-row gap-3">
               <Button
@@ -121,7 +121,7 @@ export default function LandingPage() {
             Everything You Need to Succeed
           </h2>
           <p className="text-muted-foreground max-w-xl mx-auto">
-            Whether you're looking for work or hiring talent, Work-Quickie has the tools to make it happen.
+            Whether you're looking for work or hiring talent, Open-Jobs has the tools to make it happen.
           </p>
         </div>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
@@ -170,8 +170,8 @@ export default function LandingPage() {
         <div className="max-w-xl mx-auto">
           <div className="flex justify-center mb-6">
             <img
-              src="/assets/Work-Quickie1.png"
-              alt="Work-Quickie"
+              src="/assets/openj1.png"
+              alt="Open-Jobs"
               className="h-16 w-auto object-contain"
             />
           </div>
@@ -179,7 +179,7 @@ export default function LandingPage() {
             Ready to Get Started?
           </h2>
           <p className="text-muted-foreground mb-6">
-            Join Work-Quickie today and connect with opportunities that match your skills.
+            Join Open-Jobs today and connect with opportunities that match your skills.
           </p>
           <Button
             onClick={login}

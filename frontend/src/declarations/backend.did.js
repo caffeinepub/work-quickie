@@ -15,13 +15,20 @@ export const Analytics = IDL.Record({
   'totalPosters' : IDL.Nat,
   'totalApplications' : IDL.Nat,
 });
+export const JobType = IDL.Variant({
+  'nysc' : IDL.Null,
+  'partTime' : IDL.Null,
+  'fullTime' : IDL.Null,
+  'artisan' : IDL.Null,
+  'shortTerm' : IDL.Null,
+});
 export const JobListing = IDL.Record({
   'id' : IDL.Nat,
   'pay' : IDL.Nat,
   'title' : IDL.Text,
   'active' : IDL.Bool,
   'postedBy' : IDL.Principal,
-  'jobType' : IDL.Text,
+  'jobType' : JobType,
   'description' : IDL.Text,
   'timestamp' : IDL.Int,
   'requiredSkills' : IDL.Vec(IDL.Text),
@@ -64,7 +71,7 @@ export const Rating = IDL.Record({
   'timestamp' : IDL.Int,
 });
 export const JobFilter = IDL.Record({
-  'jobType' : IDL.Opt(IDL.Text),
+  'jobType' : IDL.Opt(JobType),
   'minPay' : IDL.Opt(IDL.Nat),
   'keyword' : IDL.Opt(IDL.Text),
   'maxPay' : IDL.Opt(IDL.Nat),
@@ -84,7 +91,7 @@ export const idlService = IDL.Service({
   'applyToJob' : IDL.Func([IDL.Nat, IDL.Text], [], []),
   'assignCallerUserRole' : IDL.Func([IDL.Principal, UserRole], [], []),
   'createJobListing' : IDL.Func(
-      [IDL.Text, IDL.Text, IDL.Vec(IDL.Text), IDL.Text, IDL.Nat, IDL.Text],
+      [IDL.Text, IDL.Text, IDL.Vec(IDL.Text), IDL.Text, IDL.Nat, JobType],
       [IDL.Nat],
       [],
     ),
@@ -159,13 +166,20 @@ export const idlFactory = ({ IDL }) => {
     'totalPosters' : IDL.Nat,
     'totalApplications' : IDL.Nat,
   });
+  const JobType = IDL.Variant({
+    'nysc' : IDL.Null,
+    'partTime' : IDL.Null,
+    'fullTime' : IDL.Null,
+    'artisan' : IDL.Null,
+    'shortTerm' : IDL.Null,
+  });
   const JobListing = IDL.Record({
     'id' : IDL.Nat,
     'pay' : IDL.Nat,
     'title' : IDL.Text,
     'active' : IDL.Bool,
     'postedBy' : IDL.Principal,
-    'jobType' : IDL.Text,
+    'jobType' : JobType,
     'description' : IDL.Text,
     'timestamp' : IDL.Int,
     'requiredSkills' : IDL.Vec(IDL.Text),
@@ -208,7 +222,7 @@ export const idlFactory = ({ IDL }) => {
     'timestamp' : IDL.Int,
   });
   const JobFilter = IDL.Record({
-    'jobType' : IDL.Opt(IDL.Text),
+    'jobType' : IDL.Opt(JobType),
     'minPay' : IDL.Opt(IDL.Nat),
     'keyword' : IDL.Opt(IDL.Text),
     'maxPay' : IDL.Opt(IDL.Nat),
@@ -228,7 +242,7 @@ export const idlFactory = ({ IDL }) => {
     'applyToJob' : IDL.Func([IDL.Nat, IDL.Text], [], []),
     'assignCallerUserRole' : IDL.Func([IDL.Principal, UserRole], [], []),
     'createJobListing' : IDL.Func(
-        [IDL.Text, IDL.Text, IDL.Vec(IDL.Text), IDL.Text, IDL.Nat, IDL.Text],
+        [IDL.Text, IDL.Text, IDL.Vec(IDL.Text), IDL.Text, IDL.Nat, JobType],
         [IDL.Nat],
         [],
       ),

@@ -49,6 +49,14 @@ import { toast } from 'sonner';
 
 const ITEMS_PER_PAGE = 10;
 
+const JOB_TYPE_LABELS: Record<string, string> = {
+  fullTime: 'Full-Time',
+  partTime: 'Part-Time',
+  nysc: 'NYSC (Youth Corps)',
+  artisan: 'Artisan',
+  shortTerm: 'Short-Term',
+};
+
 function AnalyticsCards() {
   const { data: analytics, isLoading } = useAdminGetAnalytics();
 
@@ -164,7 +172,9 @@ function JobsTable() {
                 <TableRow key={job.id.toString()}>
                   <TableCell className="font-medium max-w-[200px] truncate">{job.title}</TableCell>
                   <TableCell>
-                    <span className="text-xs bg-secondary px-2 py-0.5 rounded-md">{job.jobType}</span>
+                    <span className="text-xs bg-secondary px-2 py-0.5 rounded-md">
+                      {JOB_TYPE_LABELS[job.jobType] || job.jobType}
+                    </span>
                   </TableCell>
                   <TableCell className="text-muted-foreground text-sm">{job.location || '—'}</TableCell>
                   <TableCell className="text-sm">${Number(job.pay).toLocaleString()}</TableCell>
@@ -484,22 +494,20 @@ function AdminDashboardContent() {
         </div>
       </div>
 
-      {/* Analytics */}
       <AnalyticsCards />
 
-      {/* Tabs */}
       <Tabs defaultValue="jobs">
         <TabsList className="mb-4">
           <TabsTrigger value="jobs">
             <Briefcase className="w-4 h-4 mr-1.5" />
-            Job Listings
+            Jobs
           </TabsTrigger>
           <TabsTrigger value="seekers">
             <Users className="w-4 h-4 mr-1.5" />
             Seekers
           </TabsTrigger>
           <TabsTrigger value="posters">
-            <Briefcase className="w-4 h-4 mr-1.5" />
+            <UserCheck className="w-4 h-4 mr-1.5" />
             Posters
           </TabsTrigger>
         </TabsList>

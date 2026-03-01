@@ -10,6 +10,7 @@ import type {
   Analytics,
   JobFilter,
 } from '../backend';
+import { JobType } from '../backend';
 import type { Principal } from '@icp-sdk/core/principal';
 
 // ─── User Profile ──────────────────────────────────────────────────────────
@@ -183,7 +184,7 @@ export function useCreateJobListing() {
       requiredSkills: string[];
       location: string;
       pay: bigint;
-      jobType: string;
+      jobType: JobType;
     }) => {
       if (!actor) throw new Error('Actor not available');
       return actor.createJobListing(

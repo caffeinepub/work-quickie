@@ -2,11 +2,15 @@
   "kind": "feature_evidence_report",
   "features": [
     {
-      "featureId": "feature-save-the-uploaded-work-quickie-logo-image-lightning-bolt-graphic-with-work-quickie-red-text-as-a-static-asset-at-frontend-public-assets-generated-work-quickie-logo-png-and-replace-any-existing-text-only-or-placeholder-logo-in-the-app-header-navbar-layout-tsx-and-the-landing-page-landingpage-tsx-with-this-image-the-logo-should-render-at-an-appropriate-size-e-g-height-40px-in-the-header-height-64px-on-the-landing-page-and-link-to-the-home-route",
-      "featureTitle": "Save the uploaded Work-Quickie logo image (lightning bolt graphic with 'Work-Quickie' red text) as a static asset at frontend/public/assets/generated/work-quickie-logo.png and replace any existing text-only or placeholder logo in the app header/navbar (Layout.tsx) and the landing page (LandingPage.tsx) with this image. The logo should render at an appropriate size (e.g., height 40px in the header, height 64px on the landing page) and link to the home route.",
+      "featureId": "feature-replace-all-occurrences-of-the-job-type-label-short-time-with-nysc-youth-corps-across-the-entire-frontend-including-job-type-badges-filter-dropdowns-selection-options-and-any-display-text-where-short-time-appears-as-a-job-category-or-section-label",
+      "featureTitle": "Replace all occurrences of the job type label 'Short-Time' with 'NYSC (Youth Corps)' across the entire frontend, including job type badges, filter dropdowns, selection options, and any display text where 'Short-Time' appears as a job category or section label.",
       "files": [
+        "frontend/src/components/JobFilters.tsx",
+        "frontend/src/components/JobListingCard.tsx",
         "frontend/src/components/LandingPage.tsx",
-        "frontend/src/components/Layout.tsx"
+        "frontend/src/pages/AdminDashboard.tsx",
+        "frontend/src/pages/JobDetailPage.tsx",
+        "frontend/src/pages/JobPostingForm.tsx"
       ],
       "components": [
         "authorization@4.0.0",
@@ -17,7 +21,7 @@
         "github-export-icp-cli@1.0.0"
       ],
       "testIds": [
-        "REQ-12"
+        "REQ-1"
       ],
       "confidence": "high"
     }
