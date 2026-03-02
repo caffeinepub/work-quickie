@@ -1,16 +1,20 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useActor } from './useActor';
-import type {
-  UserProfile,
+import {
+  JobFilter,
+  JobListing,
   SeekerProfile,
   PosterProfile,
-  JobListing,
   Application,
   Rating,
   Analytics,
-  JobFilter,
+  UserProfile,
+  JobType,
+  Advertisement,
+  AdvertisementPlacement,
+  ExternalBlob,
 } from '../backend';
-import { JobType } from '../backend';
+import { toast } from 'sonner';
 import type { Principal } from '@icp-sdk/core/principal';
 
 // ─── User Profile ──────────────────────────────────────────────────────────
@@ -35,10 +39,21 @@ export function useGetCallerUserProfile() {
   };
 }
 
+export function useIsCallerAdmin() {
+  const { actor, isFetching } = useActor();
+  return useQuery<boolean>({
+    queryKey: ['isCallerAdmin'],
+    queryFn: async () => {
+      if (!actor) return false;
+      return actor.isCallerAdmin();
+    },
+    enabled: !!actor && !isFetching,
+  });
+}
+
 export function useSaveCallerUserProfile() {
   const { actor } = useActor();
   const queryClient = useQueryClient();
-
   return useMutation({
     mutationFn: async (profile: UserProfile) => {
       if (!actor) throw new Error('Actor not available');
@@ -52,23 +67,23 @@ export function useSaveCallerUserProfile() {
 
 // ─── Seeker Profile ────────────────────────────────────────────────────────
 
-export function useGetSeekerProfile(id: Principal | null) {
-  const { actor, isFetching: actorFetching } = useActor();
-
+export function useGetSeekerProfile(id: Principal | string | null | undefined) {
+  const { actor, isFetching } = useActor();
+  const idStr = id ? (typeof id === 'string' ? id : id.toString()) : undefined;
   return useQuery<SeekerProfile | null>({
-    queryKey: ['seekerProfile', id?.toString()],
+    queryKey: ['seekerProfile', idStr],
     queryFn: async () => {
-      if (!actor || !id) return null;
-      return actor.getSeekerProfile(id);
+      if (!actor || !idStr) return null;
+      const { Principal } = await import('@dfinity/principal');
+      return actor.getSeekerProfile(Principal.fromText(idStr));
     },
-    enabled: !!actor && !actorFetching && !!id,
+    enabled: !!actor && !isFetching && !!idStr,
   });
 }
 
 export function useCreateSeekerProfile() {
   const { actor } = useActor();
   const queryClient = useQueryClient();
-
   return useMutation({
     mutationFn: async (data: {
       name: string;
@@ -98,7 +113,6 @@ export function useCreateSeekerProfile() {
 export function useUpdateSeekerAvailability() {
   const { actor } = useActor();
   const queryClient = useQueryClient();
-
   return useMutation({
     mutationFn: async (available: boolean) => {
       if (!actor) throw new Error('Actor not available');
@@ -112,23 +126,23 @@ export function useUpdateSeekerAvailability() {
 
 // ─── Poster Profile ────────────────────────────────────────────────────────
 
-export function useGetPosterProfile(id: Principal | null) {
-  const { actor, isFetching: actorFetching } = useActor();
-
+export function useGetPosterProfile(id: Principal | string | null | undefined) {
+  const { actor, isFetching } = useActor();
+  const idStr = id ? (typeof id === 'string' ? id : id.toString()) : undefined;
   return useQuery<PosterProfile | null>({
-    queryKey: ['posterProfile', id?.toString()],
+    queryKey: ['posterProfile', idStr],
     queryFn: async () => {
-      if (!actor || !id) return null;
-      return actor.getPosterProfile(id);
+      if (!actor || !idStr) return null;
+      const { Principal } = await import('@dfinity/principal');
+      return actor.getPosterProfile(Principal.fromText(idStr));
     },
-    enabled: !!actor && !actorFetching && !!id,
+    enabled: !!actor && !isFetching && !!idStr,
   });
 }
 
 export function useCreatePosterProfile() {
   const { actor } = useActor();
   const queryClient = useQueryClient();
-
   return useMutation({
     mutationFn: async (data: {
       name: string;
@@ -148,35 +162,46 @@ export function useCreatePosterProfile() {
 // ─── Job Listings ──────────────────────────────────────────────────────────
 
 export function useSearchJobs(filter: JobFilter) {
-  const { actor, isFetching: actorFetching } = useActor();
-
+  const { actor, isFetching } = useActor();
   return useQuery<JobListing[]>({
     queryKey: ['jobs', filter],
     queryFn: async () => {
       if (!actor) return [];
       return actor.searchJobs(filter);
     },
-    enabled: !!actor && !actorFetching,
+    enabled: !!actor && !isFetching,
   });
 }
 
-export function useGetJobListing(id: bigint | null) {
-  const { actor, isFetching: actorFetching } = useActor();
-
+export function useGetJobListing(id: bigint | null | undefined) {
+  const { actor, isFetching } = useActor();
   return useQuery<JobListing | null>({
     queryKey: ['job', id?.toString()],
     queryFn: async () => {
-      if (!actor || id === null) return null;
+      if (!actor || id === null || id === undefined) return null;
       return actor.getJobListing(id);
     },
-    enabled: !!actor && !actorFetching && id !== null,
+    enabled: !!actor && !isFetching && id !== null && id !== undefined,
+  });
+}
+
+export function useGetMatchedJobs(seekerId: Principal | string | null | undefined) {
+  const { actor, isFetching } = useActor();
+  const idStr = seekerId ? (typeof seekerId === 'string' ? seekerId : seekerId.toString()) : undefined;
+  return useQuery<JobListing[]>({
+    queryKey: ['matchedJobs', idStr],
+    queryFn: async () => {
+      if (!actor || !idStr) return [];
+      const { Principal } = await import('@dfinity/principal');
+      return actor.getMatchedJobsForSeeker(Principal.fromText(idStr));
+    },
+    enabled: !!actor && !isFetching && !!idStr,
   });
 }
 
 export function useCreateJobListing() {
   const { actor } = useActor();
   const queryClient = useQueryClient();
-
   return useMutation({
     mutationFn: async (data: {
       title: string;
@@ -198,7 +223,6 @@ export function useCreateJobListing() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['jobs'] });
-      queryClient.invalidateQueries({ queryKey: ['posterJobs'] });
     },
   });
 }
@@ -206,73 +230,56 @@ export function useCreateJobListing() {
 export function useUpdateJobListingStatus() {
   const { actor } = useActor();
   const queryClient = useQueryClient();
-
   return useMutation({
-    mutationFn: async ({ jobId, active }: { jobId: bigint; active: boolean }) => {
+    mutationFn: async (data: { jobId: bigint; active: boolean }) => {
       if (!actor) throw new Error('Actor not available');
-      return actor.updateJobListingStatus(jobId, active);
+      return actor.updateJobListingStatus(data.jobId, data.active);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['jobs'] });
-      queryClient.invalidateQueries({ queryKey: ['posterJobs'] });
       queryClient.invalidateQueries({ queryKey: ['job'] });
+      queryClient.invalidateQueries({ queryKey: ['adminJobs'] });
     },
-  });
-}
-
-export function useGetMatchedJobs(seekerId: Principal | null) {
-  const { actor, isFetching: actorFetching } = useActor();
-
-  return useQuery<JobListing[]>({
-    queryKey: ['matchedJobs', seekerId?.toString()],
-    queryFn: async () => {
-      if (!actor || !seekerId) return [];
-      return actor.getMatchedJobsForSeeker(seekerId);
-    },
-    enabled: !!actor && !actorFetching && !!seekerId,
   });
 }
 
 // ─── Applications ──────────────────────────────────────────────────────────
 
-export function useGetMyApplications() {
-  const { actor, isFetching: actorFetching } = useActor();
+export function useGetApplicationsForJob(jobId: bigint | null | undefined) {
+  const { actor, isFetching } = useActor();
+  return useQuery<Application[]>({
+    queryKey: ['applications', jobId?.toString()],
+    queryFn: async () => {
+      if (!actor || jobId === null || jobId === undefined) return [];
+      return actor.getApplicationsForJob(jobId);
+    },
+    enabled: !!actor && !isFetching && jobId !== null && jobId !== undefined,
+  });
+}
 
+export function useGetMyApplications() {
+  const { actor, isFetching } = useActor();
   return useQuery<Application[]>({
     queryKey: ['myApplications'],
     queryFn: async () => {
       if (!actor) return [];
       return actor.getMyApplications();
     },
-    enabled: !!actor && !actorFetching,
-  });
-}
-
-export function useGetApplicationsForJob(jobId: bigint | null) {
-  const { actor, isFetching: actorFetching } = useActor();
-
-  return useQuery<Application[]>({
-    queryKey: ['jobApplications', jobId?.toString()],
-    queryFn: async () => {
-      if (!actor || jobId === null) return [];
-      return actor.getApplicationsForJob(jobId);
-    },
-    enabled: !!actor && !actorFetching && jobId !== null,
+    enabled: !!actor && !isFetching,
   });
 }
 
 export function useApplyToJob() {
   const { actor } = useActor();
   const queryClient = useQueryClient();
-
   return useMutation({
-    mutationFn: async ({ jobId, message }: { jobId: bigint; message: string }) => {
+    mutationFn: async (data: { jobId: bigint; message: string }) => {
       if (!actor) throw new Error('Actor not available');
-      return actor.applyToJob(jobId, message);
+      return actor.applyToJob(data.jobId, data.message);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['myApplications'] });
-      queryClient.invalidateQueries({ queryKey: ['jobApplications'] });
+      queryClient.invalidateQueries({ queryKey: ['applications'] });
     },
   });
 }
@@ -280,71 +287,72 @@ export function useApplyToJob() {
 export function useUpdateApplicationStatus() {
   const { actor } = useActor();
   const queryClient = useQueryClient();
-
   return useMutation({
-    mutationFn: async ({
-      jobId,
-      seekerId,
-      newStatus,
-    }: {
+    mutationFn: async (data: {
       jobId: bigint;
-      seekerId: Principal;
+      seekerId: Principal | string;
       newStatus: string;
     }) => {
       if (!actor) throw new Error('Actor not available');
-      return actor.updateApplicationStatus(jobId, seekerId, newStatus);
+      const { Principal } = await import('@dfinity/principal');
+      const seekerPrincipal =
+        typeof data.seekerId === 'string'
+          ? Principal.fromText(data.seekerId)
+          : data.seekerId;
+      return actor.updateApplicationStatus(data.jobId, seekerPrincipal, data.newStatus);
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['jobApplications'] });
-      queryClient.invalidateQueries({ queryKey: ['myApplications'] });
+      queryClient.invalidateQueries({ queryKey: ['applications'] });
     },
   });
 }
 
 // ─── Ratings ───────────────────────────────────────────────────────────────
 
-export function useGetRatingsForUser(userId: Principal | null) {
-  const { actor, isFetching: actorFetching } = useActor();
-
+export function useGetRatingsForUser(userId: Principal | string | null | undefined) {
+  const { actor, isFetching } = useActor();
+  const idStr = userId ? (typeof userId === 'string' ? userId : userId.toString()) : undefined;
   return useQuery<Rating[]>({
-    queryKey: ['ratings', userId?.toString()],
+    queryKey: ['ratings', idStr],
     queryFn: async () => {
-      if (!actor || !userId) return [];
-      return actor.getRatingsForUser(userId);
+      if (!actor || !idStr) return [];
+      const { Principal } = await import('@dfinity/principal');
+      return actor.getRatingsForUser(Principal.fromText(idStr));
     },
-    enabled: !!actor && !actorFetching && !!userId,
+    enabled: !!actor && !isFetching && !!idStr,
   });
 }
 
-export function useGetAverageRating(userId: Principal | null) {
-  const { actor, isFetching: actorFetching } = useActor();
-
+export function useGetAverageRating(userId: Principal | string | null | undefined) {
+  const { actor, isFetching } = useActor();
+  const idStr = userId ? (typeof userId === 'string' ? userId : userId.toString()) : undefined;
   return useQuery<number>({
-    queryKey: ['averageRating', userId?.toString()],
+    queryKey: ['averageRating', idStr],
     queryFn: async () => {
-      if (!actor || !userId) return 0;
-      return actor.getAverageRatingForUser(userId);
+      if (!actor || !idStr) return 0;
+      const { Principal } = await import('@dfinity/principal');
+      return actor.getAverageRatingForUser(Principal.fromText(idStr));
     },
-    enabled: !!actor && !actorFetching && !!userId,
+    enabled: !!actor && !isFetching && !!idStr,
   });
 }
 
 export function useSubmitRating() {
   const { actor } = useActor();
   const queryClient = useQueryClient();
-
   return useMutation({
-    mutationFn: async ({
-      revieweeId,
-      score,
-      comment,
-    }: {
-      revieweeId: Principal;
+    mutationFn: async (data: {
+      revieweeId: Principal | string;
       score: bigint;
       comment: string;
     }) => {
       if (!actor) throw new Error('Actor not available');
-      return actor.submitRating(revieweeId, score, comment);
+      const { Principal } = await import('@dfinity/principal');
+      const revieweePrincipal =
+        typeof data.revieweeId === 'string'
+          ? Principal.fromText(data.revieweeId)
+          : data.revieweeId;
+      return actor.submitRating(revieweePrincipal, data.score, data.comment);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['ratings'] });
@@ -355,75 +363,57 @@ export function useSubmitRating() {
 
 // ─── Admin ─────────────────────────────────────────────────────────────────
 
-export function useIsCallerAdmin() {
-  const { actor, isFetching: actorFetching } = useActor();
-
-  return useQuery<boolean>({
-    queryKey: ['isAdmin'],
-    queryFn: async () => {
-      if (!actor) return false;
-      return actor.isCallerAdmin();
-    },
-    enabled: !!actor && !actorFetching,
-  });
-}
-
-export function useAdminGetAnalytics() {
-  const { actor, isFetching: actorFetching } = useActor();
-
-  return useQuery<Analytics>({
-    queryKey: ['adminAnalytics'],
-    queryFn: async () => {
-      if (!actor) throw new Error('Actor not available');
-      return actor.adminGetAnalytics();
-    },
-    enabled: !!actor && !actorFetching,
-  });
-}
-
 export function useAdminListSeekers() {
-  const { actor, isFetching: actorFetching } = useActor();
-
+  const { actor, isFetching } = useActor();
   return useQuery<SeekerProfile[]>({
     queryKey: ['adminSeekers'],
     queryFn: async () => {
       if (!actor) return [];
       return actor.adminListSeekers();
     },
-    enabled: !!actor && !actorFetching,
+    enabled: !!actor && !isFetching,
   });
 }
 
 export function useAdminListPosters() {
-  const { actor, isFetching: actorFetching } = useActor();
-
+  const { actor, isFetching } = useActor();
   return useQuery<PosterProfile[]>({
     queryKey: ['adminPosters'],
     queryFn: async () => {
       if (!actor) return [];
       return actor.adminListPosters();
     },
-    enabled: !!actor && !actorFetching,
+    enabled: !!actor && !isFetching,
   });
 }
 
 export function useAdminListJobListings() {
-  const { actor, isFetching: actorFetching } = useActor();
-
+  const { actor, isFetching } = useActor();
   return useQuery<JobListing[]>({
     queryKey: ['adminJobs'],
     queryFn: async () => {
       if (!actor) return [];
       return actor.adminListJobListings();
     },
-    enabled: !!actor && !actorFetching,
+    enabled: !!actor && !isFetching,
   });
 }
 
-export function useAdminApproveJob() {
+export function useAdminGetAnalytics() {
+  const { actor, isFetching } = useActor();
+  return useQuery<Analytics>({
+    queryKey: ['adminAnalytics'],
+    queryFn: async () => {
+      if (!actor) throw new Error('Actor not available');
+      return actor.adminGetAnalytics();
+    },
+    enabled: !!actor && !isFetching,
+  });
+}
+
+export function useAdminApproveJobListing() {
   const { actor } = useActor();
   const queryClient = useQueryClient();
-
   return useMutation({
     mutationFn: async (jobId: bigint) => {
       if (!actor) throw new Error('Actor not available');
@@ -436,10 +426,9 @@ export function useAdminApproveJob() {
   });
 }
 
-export function useAdminRemoveJob() {
+export function useAdminRemoveJobListing() {
   const { actor } = useActor();
   const queryClient = useQueryClient();
-
   return useMutation({
     mutationFn: async (jobId: bigint) => {
       if (!actor) throw new Error('Actor not available');
@@ -455,15 +444,162 @@ export function useAdminRemoveJob() {
 export function useAdminVerifyPoster() {
   const { actor } = useActor();
   const queryClient = useQueryClient();
-
   return useMutation({
-    mutationFn: async (posterId: Principal) => {
+    mutationFn: async (posterId: Principal | string) => {
       if (!actor) throw new Error('Actor not available');
-      return actor.adminVerifyPoster(posterId);
+      const { Principal } = await import('@dfinity/principal');
+      const p = typeof posterId === 'string' ? Principal.fromText(posterId) : posterId;
+      return actor.adminVerifyPoster(p);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['adminPosters'] });
-      queryClient.invalidateQueries({ queryKey: ['posterProfile'] });
+    },
+  });
+}
+
+// ─── Advertisements ────────────────────────────────────────────────────────
+
+export function useGetAdsByPlacement(placement: AdvertisementPlacement) {
+  const { actor, isFetching } = useActor();
+  return useQuery<Advertisement[]>({
+    queryKey: ['adsByPlacement', placement],
+    queryFn: async () => {
+      if (!actor) return [];
+      return actor.getAdsByPlacement(placement);
+    },
+    enabled: !!actor && !isFetching,
+  });
+}
+
+export function useGetAllAds() {
+  const { actor, isFetching } = useActor();
+  return useQuery<Advertisement[]>({
+    queryKey: ['allAds'],
+    queryFn: async () => {
+      if (!actor) return [];
+      const placements = [
+        AdvertisementPlacement.jobBoard,
+        AdvertisementPlacement.jobDetail,
+        AdvertisementPlacement.seekerDashboard,
+        AdvertisementPlacement.posterDashboard,
+        AdvertisementPlacement.landing,
+      ];
+      const results = await Promise.all(
+        placements.map((p) => actor.getAdsByPlacement(p))
+      );
+      const allAds = results.flat();
+      const seen = new Set<string>();
+      return allAds.filter((ad) => {
+        const key = ad.id.toString();
+        if (seen.has(key)) return false;
+        seen.add(key);
+        return true;
+      });
+    },
+    enabled: !!actor && !isFetching,
+  });
+}
+
+export function useCreateAd() {
+  const { actor } = useActor();
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: async (data: {
+      title: string;
+      image: ExternalBlob;
+      linkUrl: string;
+      placement: AdvertisementPlacement;
+      expiresAt: bigint | null;
+    }) => {
+      if (!actor) throw new Error('Actor not available');
+      return actor.createAd(
+        data.title,
+        data.image,
+        data.linkUrl,
+        data.placement,
+        data.expiresAt
+      );
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['adsByPlacement'] });
+      queryClient.invalidateQueries({ queryKey: ['allAds'] });
+      toast.success('Advertisement created successfully');
+    },
+    onError: (error: Error) => {
+      toast.error(`Failed to create advertisement: ${error.message}`);
+    },
+  });
+}
+
+export function useUpdateAd() {
+  const { actor } = useActor();
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: async (data: {
+      adId: bigint;
+      title: string;
+      image: ExternalBlob;
+      linkUrl: string;
+      placement: AdvertisementPlacement;
+      expiresAt: bigint | null;
+    }) => {
+      if (!actor) throw new Error('Actor not available');
+      return actor.updateAd(
+        data.adId,
+        data.title,
+        data.image,
+        data.linkUrl,
+        data.placement,
+        data.expiresAt
+      );
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['adsByPlacement'] });
+      queryClient.invalidateQueries({ queryKey: ['allAds'] });
+      toast.success('Advertisement updated successfully');
+    },
+    onError: (error: Error) => {
+      toast.error(`Failed to update advertisement: ${error.message}`);
+    },
+  });
+}
+
+export function useDeleteAd() {
+  const { actor } = useActor();
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: async (adId: bigint) => {
+      if (!actor) throw new Error('Actor not available');
+      return actor.deleteAd(adId);
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['adsByPlacement'] });
+      queryClient.invalidateQueries({ queryKey: ['allAds'] });
+      toast.success('Advertisement deleted successfully');
+    },
+    onError: (error: Error) => {
+      toast.error(`Failed to delete advertisement: ${error.message}`);
+    },
+  });
+}
+
+export function useToggleAdActive() {
+  const { actor } = useActor();
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: async (data: { adId: bigint; isActive: boolean }) => {
+      if (!actor) throw new Error('Actor not available');
+      return actor.toggleAdActive(data.adId, data.isActive);
+    },
+    onSuccess: (_data, variables) => {
+      queryClient.invalidateQueries({ queryKey: ['adsByPlacement'] });
+      queryClient.invalidateQueries({ queryKey: ['allAds'] });
+      toast.success(
+        variables.isActive ? 'Advertisement activated' : 'Advertisement deactivated'
+      );
+    },
+    onError: (error: Error) => {
+      toast.error(`Failed to toggle advertisement: ${error.message}`);
     },
   });
 }

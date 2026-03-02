@@ -8,7 +8,6 @@ import {
   useGetAverageRating,
 } from '../hooks/useQueries';
 import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
 import { Skeleton } from '@/components/ui/skeleton';
 import { StarRating } from '../components/RatingDisplay';
 import RatingForm from '../components/RatingForm';
@@ -46,6 +45,7 @@ function ApplicantCard({
   isUpdating: boolean;
   posterId: Principal | null;
 }) {
+  // Pass Principal directly — hooks now accept Principal | string | null | undefined
   const { data: seekerProfile } = useGetSeekerProfile(application.seekerId);
   const { data: avgRating = 0 } = useGetAverageRating(application.seekerId);
   const [showRatingForm, setShowRatingForm] = useState(false);
@@ -165,6 +165,7 @@ export default function JobApplicantsView() {
     try {
       await updateStatus.mutateAsync({
         jobId: application.jobId,
+        // Pass Principal directly — hook now accepts Principal | string
         seekerId: application.seekerId,
         newStatus,
       });

@@ -2,15 +2,10 @@
   "kind": "feature_evidence_report",
   "features": [
     {
-      "featureId": "feature-replace-all-occurrences-of-the-job-type-label-short-time-with-nysc-youth-corps-across-the-entire-frontend-including-job-type-badges-filter-dropdowns-selection-options-and-any-display-text-where-short-time-appears-as-a-job-category-or-section-label",
-      "featureTitle": "Replace all occurrences of the job type label 'Short-Time' with 'NYSC (Youth Corps)' across the entire frontend, including job type badges, filter dropdowns, selection options, and any display text where 'Short-Time' appears as a job category or section label.",
+      "featureId": "feature-add-tanstack-query-hooks-in-frontend-src-hooks-usequeries-ts-for-advertisement-operations-usegetadsbyplacement-placement-usecreatead-useupdatead-usedeletead-and-usetoggleadactive-mutations",
+      "featureTitle": "Add TanStack Query hooks in frontend/src/hooks/useQueries.ts for advertisement operations: useGetAdsByPlacement(placement), useCreateAd, useUpdateAd, useDeleteAd, and useToggleAdActive mutations.",
       "files": [
-        "frontend/src/components/JobFilters.tsx",
-        "frontend/src/components/JobListingCard.tsx",
-        "frontend/src/components/LandingPage.tsx",
-        "frontend/src/pages/AdminDashboard.tsx",
-        "frontend/src/pages/JobDetailPage.tsx",
-        "frontend/src/pages/JobPostingForm.tsx"
+        "frontend/src/hooks/useQueries.ts"
       ],
       "components": [
         "authorization@4.0.0",
@@ -18,10 +13,76 @@
         "shadcn-ui@1.0.0",
         "build-template-react@1.0.0",
         "initial-app@1.0.0",
-        "github-export-icp-cli@1.0.0"
+        "github-export-icp-cli@1.0.0",
+        "blob-storage@4.0.0"
       ],
       "testIds": [
-        "REQ-1"
+        "REQ-2"
+      ],
+      "confidence": "high"
+    },
+    {
+      "featureId": "feature-create-a-reusable-adbanner-component-at-frontend-src-components-adbanner-tsx-that-accepts-a-placement-prop-fetches-active-ads-for-that-placement-via-usegetadsbyplacement-and-renders-a-dismissible-banner-card-with-the-ad-image-title-and-an-external-link-show-nothing-if-no-active-ads-exist-for-the-placement-include-a-subtle-advertisement-label-for-transparency",
+      "featureTitle": "Create a reusable AdBanner component at frontend/src/components/AdBanner.tsx that accepts a placement prop, fetches active ads for that placement via useGetAdsByPlacement, and renders a dismissible banner card with the ad image, title, and an external link. Show nothing if no active ads exist for the placement. Include a subtle 'Advertisement' label for transparency.",
+      "files": [
+        "frontend/src/components/AdBanner.tsx"
+      ],
+      "components": [
+        "authorization@4.0.0",
+        "core-infrastructure@1.0.2",
+        "shadcn-ui@1.0.0",
+        "build-template-react@1.0.0",
+        "initial-app@1.0.0",
+        "github-export-icp-cli@1.0.0",
+        "blob-storage@4.0.0"
+      ],
+      "testIds": [
+        "REQ-3"
+      ],
+      "confidence": "high"
+    },
+    {
+      "featureId": "feature-integrate-the-adbanner-component-into-appropriate-areas-of-the-app-place-one-instance-in-frontend-src-pages-jobboard-tsx-above-or-between-the-job-listing-grid-one-in-frontend-src-pages-jobdetailpage-tsx-below-the-job-details-section-one-in-frontend-src-components-landingpage-tsx-below-the-hero-section-one-in-frontend-src-pages-seekerdashboard-tsx-at-the-top-of-the-main-content-area-and-one-in-frontend-src-pages-posterdashboard-tsx-at-the-top-of-the-main-content-area-each-instance-must-pass-the-corresponding-placement-value",
+      "featureTitle": "Integrate the AdBanner component into appropriate areas of the app: place one instance in frontend/src/pages/JobBoard.tsx (above or between the job listing grid), one in frontend/src/pages/JobDetailPage.tsx (below the job details section), one in frontend/src/components/LandingPage.tsx (below the hero section), one in frontend/src/pages/SeekerDashboard.tsx (at the top of the main content area), and one in frontend/src/pages/PosterDashboard.tsx (at the top of the main content area). Each instance must pass the corresponding placement value.",
+      "files": [
+        "frontend/src/components/LandingPage.tsx",
+        "frontend/src/pages/JobBoard.tsx",
+        "frontend/src/pages/JobDetailPage.tsx",
+        "frontend/src/pages/PosterDashboard.tsx",
+        "frontend/src/pages/SeekerDashboard.tsx"
+      ],
+      "components": [
+        "authorization@4.0.0",
+        "core-infrastructure@1.0.2",
+        "shadcn-ui@1.0.0",
+        "build-template-react@1.0.0",
+        "initial-app@1.0.0",
+        "github-export-icp-cli@1.0.0",
+        "blob-storage@4.0.0"
+      ],
+      "testIds": [
+        "REQ-4"
+      ],
+      "confidence": "high"
+    },
+    {
+      "featureId": "feature-add-an-advertisements-management-tab-to-the-existing-admindashboard-page-frontend-src-pages-admindashboard-tsx-this-tab-should-display-a-table-of-all-advertisements-title-placement-active-status-expiry-link-with-actions-to-toggle-active-inactive-and-delete-each-ad-include-a-create-new-ad-button-that-opens-a-modal-form-where-the-admin-can-enter-title-image-url-link-url-placement-dropdown-and-optional-expiry-date-show-a-success-or-error-toast-notification-after-each-action",
+      "featureTitle": "Add an 'Advertisements' management tab to the existing AdminDashboard page (frontend/src/pages/AdminDashboard.tsx). This tab should display a table of all advertisements (title, placement, active status, expiry, link) with actions to toggle active/inactive and delete each ad. Include a 'Create New Ad' button that opens a modal/form where the admin can enter title, image URL, link URL, placement (dropdown), and optional expiry date. Show a success or error toast notification after each action.",
+      "files": [
+        "frontend/src/hooks/useQueries.ts",
+        "frontend/src/pages/AdminDashboard.tsx"
+      ],
+      "components": [
+        "authorization@4.0.0",
+        "core-infrastructure@1.0.2",
+        "shadcn-ui@1.0.0",
+        "build-template-react@1.0.0",
+        "initial-app@1.0.0",
+        "github-export-icp-cli@1.0.0",
+        "blob-storage@4.0.0"
+      ],
+      "testIds": [
+        "REQ-5"
       ],
       "confidence": "high"
     }

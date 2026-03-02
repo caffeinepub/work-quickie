@@ -14,6 +14,8 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import JobListingCard from '../components/JobListingCard';
 import RatingDisplay from '../components/RatingDisplay';
+import AdBanner from '../components/AdBanner';
+import { AdvertisementPlacement } from '../backend';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -24,7 +26,7 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
-import { Edit, Plus, Briefcase, Users, Star, CheckCircle } from 'lucide-react';
+import { Edit, Plus, Briefcase, Star, CheckCircle } from 'lucide-react';
 import { toast } from 'sonner';
 
 export default function PosterDashboard() {
@@ -43,7 +45,6 @@ export default function PosterDashboard() {
     (job) => principal && job.postedBy.toString() === principal.toString()
   );
 
-  // Also fetch inactive jobs by searching without active filter
   const activeJobs = myJobs.filter((j) => j.active);
   const inactiveJobs = myJobs.filter((j) => !j.active);
 
@@ -87,6 +88,9 @@ export default function PosterDashboard() {
 
   return (
     <div className="container mx-auto px-4 py-8 max-w-5xl">
+      {/* Ad Banner */}
+      <AdBanner placement={AdvertisementPlacement.posterDashboard} className="mb-6" />
+
       {/* Profile Header */}
       <div className="bg-card rounded-xl border border-border card-shadow p-6 mb-6">
         <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
@@ -212,15 +216,15 @@ export default function PosterDashboard() {
                     onDelete={() => {}}
                     onViewApplicants={(j) => navigate({ to: '/poster/jobs/$jobId/applicants', params: { jobId: j.id.toString() } })}
                   />
-                  <div className="mt-2">
+                  <div className="absolute inset-0 bg-background/50 rounded-xl flex items-center justify-center">
                     <Button
                       size="sm"
                       variant="outline"
-                      className="w-full"
                       onClick={() => handleReactivate(job)}
                       disabled={updateStatus.isPending}
+                      className="bg-background"
                     >
-                      Reactivate Listing
+                      Reactivate
                     </Button>
                   </div>
                 </div>
@@ -234,13 +238,12 @@ export default function PosterDashboard() {
         </TabsContent>
       </Tabs>
 
-      {/* Deactivate Confirmation */}
       <AlertDialog open={!!jobToDeactivate} onOpenChange={(open) => !open && setJobToDeactivate(null)}>
         <AlertDialogContent>
           <AlertDialogHeader>
             <AlertDialogTitle>Deactivate Job Listing?</AlertDialogTitle>
             <AlertDialogDescription>
-              This will hide "{jobToDeactivate?.title}" from the job board. You can reactivate it later.
+              This will deactivate "{jobToDeactivate?.title}" and remove it from the public job board.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>

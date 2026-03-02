@@ -1,16 +1,42 @@
 {
   "schemaVersion": "1.0.0",
   "projectStateVersion": 3,
-  "summary": "Project involves a multi-section app (with sections like Artisan, NYSC/Youth Corps, etc.). User is updating section labels.",
-  "architectural_notes": [],
+  "summary": "App with administrator-managed advertisement/monetisation system. Admins can add advertisement pages to appropriate areas of the app.",
+  "architectural_notes": [
+    "Admin-controlled advertisement system: admins can insert ad pages/banners into designated app areas for monetisation"
+  ],
   "known_issues": [],
   "isFixRequest": false,
   "existing_features": [
     {
-      "id": "feature-replace-all-occurrences-of-the-job-type-label-short-time-with-nysc-youth-corps-across-the-entire-frontend-including-job-type-badges-filter-dropdowns-selection-options-and-any-display-text-where-short-time-appears-as-a-job-category-or-section-label",
-      "title": "Replace all occurrences of the job type label 'Short-Time' with 'NYSC (Youth Corps)' across the entire frontend, including job type badges, filter dropdowns, selection options, and any display text where 'Short-Time' appears as a job category or section label.",
+      "id": "feature-add-tanstack-query-hooks-in-frontend-src-hooks-usequeries-ts-for-advertisement-operations-usegetadsbyplacement-placement-usecreatead-useupdatead-usedeletead-and-usetoggleadactive-mutations",
+      "title": "Add TanStack Query hooks in frontend/src/hooks/useQueries.ts for advertisement operations: useGetAdsByPlacement(placement), useCreateAd, useUpdateAd, useDeleteAd, and useToggleAdActive mutations.",
       "reqIds": [
-        "REQ-1"
+        "REQ-2"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-create-a-reusable-adbanner-component-at-frontend-src-components-adbanner-tsx-that-accepts-a-placement-prop-fetches-active-ads-for-that-placement-via-usegetadsbyplacement-and-renders-a-dismissible-banner-card-with-the-ad-image-title-and-an-external-link-show-nothing-if-no-active-ads-exist-for-the-placement-include-a-subtle-advertisement-label-for-transparency",
+      "title": "Create a reusable AdBanner component at frontend/src/components/AdBanner.tsx that accepts a placement prop, fetches active ads for that placement via useGetAdsByPlacement, and renders a dismissible banner card with the ad image, title, and an external link. Show nothing if no active ads exist for the placement. Include a subtle 'Advertisement' label for transparency.",
+      "reqIds": [
+        "REQ-3"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-integrate-the-adbanner-component-into-appropriate-areas-of-the-app-place-one-instance-in-frontend-src-pages-jobboard-tsx-above-or-between-the-job-listing-grid-one-in-frontend-src-pages-jobdetailpage-tsx-below-the-job-details-section-one-in-frontend-src-components-landingpage-tsx-below-the-hero-section-one-in-frontend-src-pages-seekerdashboard-tsx-at-the-top-of-the-main-content-area-and-one-in-frontend-src-pages-posterdashboard-tsx-at-the-top-of-the-main-content-area-each-instance-must-pass-the-corresponding-placement-value",
+      "title": "Integrate the AdBanner component into appropriate areas of the app: place one instance in frontend/src/pages/JobBoard.tsx (above or between the job listing grid), one in frontend/src/pages/JobDetailPage.tsx (below the job details section), one in frontend/src/components/LandingPage.tsx (below the hero section), one in frontend/src/pages/SeekerDashboard.tsx (at the top of the main content area), and one in frontend/src/pages/PosterDashboard.tsx (at the top of the main content area). Each instance must pass the corresponding placement value.",
+      "reqIds": [
+        "REQ-4"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-add-an-advertisements-management-tab-to-the-existing-admindashboard-page-frontend-src-pages-admindashboard-tsx-this-tab-should-display-a-table-of-all-advertisements-title-placement-active-status-expiry-link-with-actions-to-toggle-active-inactive-and-delete-each-ad-include-a-create-new-ad-button-that-opens-a-modal-form-where-the-admin-can-enter-title-image-url-link-url-placement-dropdown-and-optional-expiry-date-show-a-success-or-error-toast-notification-after-each-action",
+      "title": "Add an 'Advertisements' management tab to the existing AdminDashboard page (frontend/src/pages/AdminDashboard.tsx). This tab should display a table of all advertisements (title, placement, active status, expiry, link) with actions to toggle active/inactive and delete each ad. Include a 'Create New Ad' button that opens a modal/form where the admin can enter title, image URL, link URL, placement (dropdown), and optional expiry date. Show a success or error toast notification after each action.",
+      "reqIds": [
+        "REQ-5"
       ],
       "version": 1
     }
@@ -18,21 +44,21 @@
   "new_feature_requests": [
     {
       "id": "AR-1",
-      "summary": "Replace 'Short-Time' section with 'NYSC (Youth Corps)' section",
+      "summary": "Admin panel to add and manage advertisement pages in appropriate areas of the app for monetisation",
       "reqIds": [],
       "status": "pending"
     },
     {
-      "id": "AR-3",
-      "summary": "Update the backend job type enum or variant in main.mo to rename the 'ShortTime' (or equivalent) variant to 'NYSC' (or 'YouthCorps'), ensuring all related backend functions, filters, and data handling reflect the new type name.",
+      "id": "AR-2",
+      "summary": "Extend the backend to support advertisement management: add an Advertisement data type with fields for id, title, imageUrl, linkUrl, placement (enum: #jobBoard, #jobDetail, #seekerDashboard, #posterDashboard, #landing), isActive (bool), createdAt, and expiresAt (optional). Implement admin-only CRUD functions: createAd, updateAd, deleteAd, toggleAdActive, and a public getAdsByPlacement query that returns active ads for a given placement.",
       "reqIds": [
-        "REQ-2"
+        "REQ-1"
       ],
       "status": "pending"
     }
   ],
   "gameProjectType": "none",
-  "projectName": "Open Jobs",
+  "projectName": "Open-Jobs",
   "clarification_mode": "instant",
   "clarification_rounds": 0
 }

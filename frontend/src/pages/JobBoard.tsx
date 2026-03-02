@@ -1,8 +1,10 @@
-import { useState, useMemo } from 'react';
+import React, { useState, useMemo } from 'react';
 import { useSearchJobs } from '../hooks/useQueries';
-import type { JobFilter } from '../backend';
-import JobListingCard from '../components/JobListingCard';
 import JobFilters, { FilterState, DEFAULT_FILTERS } from '../components/JobFilters';
+import JobListingCard from '../components/JobListingCard';
+import AdBanner from '../components/AdBanner';
+import type { JobFilter } from '../backend';
+import { AdvertisementPlacement } from '../backend';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Button } from '@/components/ui/button';
 import { Briefcase, SlidersHorizontal } from 'lucide-react';
@@ -71,6 +73,9 @@ export default function JobBoard() {
           </SheetContent>
         </Sheet>
       </div>
+
+      {/* Ad Banner */}
+      <AdBanner placement={AdvertisementPlacement.jobBoard} className="mb-6" />
 
       <div className="flex gap-6">
         {/* Desktop Filters Sidebar */}

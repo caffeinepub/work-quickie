@@ -1,66 +1,103 @@
 {
   "kind": "coverage_report",
   "version": "1.0",
-  "generatedAt": "2026-03-01T08:56:02.975Z",
+  "generatedAt": "2026-03-02T08:59:11.827Z",
   "sources": {
     "buildRequest": true,
     "implementationPlan": true
   },
   "requirements": {
-    "total": 2,
-    "implemented": 1,
+    "total": 5,
+    "implemented": 4,
     "items": [
       {
         "id": "REQ-1",
-        "summary": "Replace all occurrences of the job type label 'Short-Time' with 'NYSC (Youth Corps)' across the entire frontend, including job type badges, filter dropdowns, selection options, and any display text where 'Short-Time' appears as a job category or section label.",
-        "status": "implemented",
-        "plannedFiles": [
-          "frontend/src/components/LandingPage.tsx",
-          "frontend/src/components/JobFilters.tsx",
-          "frontend/src/pages/JobPostingForm.tsx",
-          "frontend/src/components/JobListingCard.tsx",
-          "frontend/src/pages/JobBoard.tsx",
-          "frontend/src/pages/JobDetailPage.tsx",
-          "frontend/src/pages/PosterDashboard.tsx",
-          "frontend/src/pages/SeekerDashboard.tsx",
-          "frontend/src/pages/AdminDashboard.tsx"
-        ],
-        "matchedFiles": [
-          "frontend/src/components/LandingPage.tsx",
-          "frontend/src/components/JobFilters.tsx",
-          "frontend/src/pages/JobPostingForm.tsx",
-          "frontend/src/components/JobListingCard.tsx",
-          "frontend/src/pages/JobDetailPage.tsx",
-          "frontend/src/pages/AdminDashboard.tsx"
-        ]
-      },
-      {
-        "id": "REQ-2",
-        "summary": "Update the backend job type enum or variant in main.mo to rename the 'ShortTime' (or equivalent) variant to 'NYSC' (or 'YouthCorps'), ensuring all related backend functions, filters, and data handling reflect the new type name.",
+        "summary": "Extend the backend to support advertisement management: add an Advertisement data type with fields for id, title, imageUrl, linkUrl, placement (enum: #jobBoard, #jobDetail, #seekerDashboard, #posterDashboard, #landing), isActive (bool), createdAt, and expiresAt (optional). Implement admin-only CRUD functions: createAd, updateAd, deleteAd, toggleAdActive, and a public getAdsByPlacement query that returns active ads for a given placement.",
         "status": "unknown",
         "plannedFiles": [],
         "matchedFiles": []
+      },
+      {
+        "id": "REQ-2",
+        "summary": "Add TanStack Query hooks in frontend/src/hooks/useQueries.ts for advertisement operations: useGetAdsByPlacement(placement), useCreateAd, useUpdateAd, useDeleteAd, and useToggleAdActive mutations.",
+        "status": "implemented",
+        "plannedFiles": [
+          "frontend/src/hooks/useQueries.ts"
+        ],
+        "matchedFiles": [
+          "frontend/src/hooks/useQueries.ts"
+        ]
+      },
+      {
+        "id": "REQ-3",
+        "summary": "Create a reusable AdBanner component at frontend/src/components/AdBanner.tsx that accepts a placement prop, fetches active ads for that placement via useGetAdsByPlacement, and renders a dismissible banner card with the ad image, title, and an external link. Show nothing if no active ads exist for the placement. Include a subtle 'Advertisement' label for transparency.",
+        "status": "implemented",
+        "plannedFiles": [
+          "frontend/src/components/AdBanner.tsx"
+        ],
+        "matchedFiles": [
+          "frontend/src/components/AdBanner.tsx"
+        ]
+      },
+      {
+        "id": "REQ-4",
+        "summary": "Integrate the AdBanner component into appropriate areas of the app: place one instance in frontend/src/pages/JobBoard.tsx (above or between the job listing grid), one in frontend/src/pages/JobDetailPage.tsx (below the job details section), one in frontend/src/components/LandingPage.tsx (below the hero section), one in frontend/src/pages/SeekerDashboard.tsx (at the top of the main content area), and one in frontend/src/pages/PosterDashboard.tsx (at the top of the main content area). Each instance must pass the corresponding placement value.",
+        "status": "implemented",
+        "plannedFiles": [
+          "frontend/src/pages/JobBoard.tsx",
+          "frontend/src/pages/JobDetailPage.tsx",
+          "frontend/src/components/LandingPage.tsx",
+          "frontend/src/pages/SeekerDashboard.tsx",
+          "frontend/src/pages/PosterDashboard.tsx"
+        ],
+        "matchedFiles": [
+          "frontend/src/pages/JobBoard.tsx",
+          "frontend/src/pages/JobDetailPage.tsx",
+          "frontend/src/components/LandingPage.tsx",
+          "frontend/src/pages/SeekerDashboard.tsx",
+          "frontend/src/pages/PosterDashboard.tsx"
+        ]
+      },
+      {
+        "id": "REQ-5",
+        "summary": "Add an 'Advertisements' management tab to the existing AdminDashboard page (frontend/src/pages/AdminDashboard.tsx). This tab should display a table of all advertisements (title, placement, active status, expiry, link) with actions to toggle active/inactive and delete each ad. Include a 'Create New Ad' button that opens a modal/form where the admin can enter title, image URL, link URL, placement (dropdown), and optional expiry date. Show a success or error toast notification after each action.",
+        "status": "implemented",
+        "plannedFiles": [
+          "frontend/src/pages/AdminDashboard.tsx",
+          "frontend/src/hooks/useQueries.ts"
+        ],
+        "matchedFiles": [
+          "frontend/src/pages/AdminDashboard.tsx",
+          "frontend/src/hooks/useQueries.ts"
+        ]
       }
     ]
   },
   "changedFiles": [
+    "backend/blob-storage/Mixin.mo",
+    "backend/blob-storage/Storage.mo",
     "backend/main.mo",
-    "backend/migration.mo",
     "build-request.json",
+    "caffeine.lock.json",
     "feature_evidence.json",
     "frontend-file-summaries.txt",
     "frontend-implementation-plan.json",
     "frontend/src/backend.d.ts",
     "frontend/src/backend.ts",
-    "frontend/src/components/JobFilters.tsx",
-    "frontend/src/components/JobListingCard.tsx",
+    "frontend/src/components/AdBanner.tsx",
     "frontend/src/components/LandingPage.tsx",
     "frontend/src/declarations/backend.did.d.ts",
     "frontend/src/declarations/backend.did.js",
     "frontend/src/hooks/useQueries.ts",
     "frontend/src/pages/AdminDashboard.tsx",
+    "frontend/src/pages/JobApplicantsView.tsx",
+    "frontend/src/pages/JobBoard.tsx",
     "frontend/src/pages/JobDetailPage.tsx",
     "frontend/src/pages/JobPostingForm.tsx",
+    "frontend/src/pages/PosterDashboard.tsx",
+    "frontend/src/pages/PosterProfileForm.tsx",
+    "frontend/src/pages/SeekerDashboard.tsx",
+    "frontend/src/pages/SeekerProfileForm.tsx",
     "project_state.json",
     "scratch/component-selection.json",
     "spec.md",

@@ -1,56 +1,123 @@
 {
   "kind": "build_request",
-  "title": "Replace 'Short-Time' with 'NYSC (Youth Corps)' section",
-  "projectName": "Open Jobs",
+  "title": "Admin Advertisement Management System for Monetisation",
+  "projectName": "Open-Jobs",
   "priority": "normal",
   "requirements": [
     {
       "id": "REQ-1",
-      "text": "Replace all occurrences of the job type label 'Short-Time' with 'NYSC (Youth Corps)' across the entire frontend, including job type badges, filter dropdowns, selection options, and any display text where 'Short-Time' appears as a job category or section label.",
-      "target": "frontend",
+      "text": "Extend the backend to support advertisement management: add an Advertisement data type with fields for id, title, imageUrl, linkUrl, placement (enum: #jobBoard, #jobDetail, #seekerDashboard, #posterDashboard, #landing), isActive (bool), createdAt, and expiresAt (optional). Implement admin-only CRUD functions: createAd, updateAd, deleteAd, toggleAdActive, and a public getAdsByPlacement query that returns active ads for a given placement.",
+      "target": "backend",
       "source": {
         "messageIds": [
-          "msg-9"
+          "msg-1"
         ],
         "quotes": [
-          "replace Short-Time with NYSC (Youth Corps)"
+          "create how administrator can be able to add advertisement pages on appropriate areas of the app for monetisation"
         ]
       },
       "acceptanceCriteria": [
-        "The label 'Short-Time' no longer appears anywhere in the UI.",
-        "The label 'NYSC (Youth Corps)' appears in all places where 'Short-Time' previously appeared, including job type badges on LandingPage.tsx, filter dropdowns in JobFilters.tsx, and type selectors in JobPostingForm.tsx.",
-        "Job listings previously categorized as 'Short-Time' now display as 'NYSC (Youth Corps)'.",
-        "The visual styling and layout of the replaced label matches the style of the other job type labels (e.g., Artisan)."
+        "Admin can call createAd with all required fields and receive a unique ad ID",
+        "Admin can update any field of an existing ad via updateAd",
+        "Admin can delete an ad by ID via deleteAd",
+        "Admin can toggle an ad active/inactive via toggleAdActive",
+        "getAdsByPlacement returns only currently active ads for the specified placement",
+        "Non-admin callers to createAd, updateAd, deleteAd, toggleAdActive receive an authorization error"
       ]
     },
     {
       "id": "REQ-2",
-      "text": "Update the backend job type enum or variant in main.mo to rename the 'ShortTime' (or equivalent) variant to 'NYSC' (or 'YouthCorps'), ensuring all related backend functions, filters, and data handling reflect the new type name.",
-      "target": "backend",
+      "text": "Add TanStack Query hooks in frontend/src/hooks/useQueries.ts for advertisement operations: useGetAdsByPlacement(placement), useCreateAd, useUpdateAd, useDeleteAd, and useToggleAdActive mutations.",
+      "target": "frontend",
       "source": {
         "messageIds": [
-          "msg-9"
+          "msg-1"
         ],
         "quotes": [
-          "replace Short-Time with NYSC (Youth Corps)"
+          "create how administrator can be able to add advertisement pages on appropriate areas of the app for monetisation"
         ]
       },
       "acceptanceCriteria": [
-        "The backend no longer defines or accepts a 'ShortTime' job type variant.",
-        "A new 'NYSC' (or equivalent) job type variant is defined and accepted by the backend.",
-        "All backend query and filter functions that previously handled 'ShortTime' correctly handle the new 'NYSC' type.",
-        "The frontend's job type value sent to and received from the backend matches the updated backend variant name."
+        "useGetAdsByPlacement fetches ads for a given placement and caches correctly",
+        "Mutation hooks (useCreateAd, useUpdateAd, useDeleteAd, useToggleAdActive) invalidate relevant queries on success",
+        "Hooks follow existing patterns in useQueries.ts"
+      ]
+    },
+    {
+      "id": "REQ-3",
+      "text": "Create a reusable AdBanner component at frontend/src/components/AdBanner.tsx that accepts a placement prop, fetches active ads for that placement via useGetAdsByPlacement, and renders a dismissible banner card with the ad image, title, and an external link. Show nothing if no active ads exist for the placement. Include a subtle 'Advertisement' label for transparency.",
+      "target": "frontend",
+      "source": {
+        "messageIds": [
+          "msg-1"
+        ],
+        "quotes": [
+          "create how administrator can be able to add advertisement pages on appropriate areas of the app for monetisation"
+        ]
+      },
+      "acceptanceCriteria": [
+        "AdBanner renders nothing when no active ads are available for a placement",
+        "AdBanner displays ad image, title, and external link when ads are active",
+        "A visible 'Advertisement' label is shown on the banner",
+        "The banner is dismissible by the user within the session",
+        "Component accepts a placement prop matching the backend placement enum"
+      ]
+    },
+    {
+      "id": "REQ-4",
+      "text": "Integrate the AdBanner component into appropriate areas of the app: place one instance in frontend/src/pages/JobBoard.tsx (above or between the job listing grid), one in frontend/src/pages/JobDetailPage.tsx (below the job details section), one in frontend/src/components/LandingPage.tsx (below the hero section), one in frontend/src/pages/SeekerDashboard.tsx (at the top of the main content area), and one in frontend/src/pages/PosterDashboard.tsx (at the top of the main content area). Each instance must pass the corresponding placement value.",
+      "target": "frontend",
+      "source": {
+        "messageIds": [
+          "msg-1"
+        ],
+        "quotes": [
+          "add advertisement pages on appropriate areas of the app"
+        ]
+      },
+      "acceptanceCriteria": [
+        "AdBanner appears in JobBoard with placement='jobBoard'",
+        "AdBanner appears in JobDetailPage with placement='jobDetail'",
+        "AdBanner appears in LandingPage with placement='landing'",
+        "AdBanner appears in SeekerDashboard with placement='seekerDashboard'",
+        "AdBanner appears in PosterDashboard with placement='posterDashboard'",
+        "Banners are non-intrusive and do not obstruct primary app content"
+      ]
+    },
+    {
+      "id": "REQ-5",
+      "text": "Add an 'Advertisements' management tab to the existing AdminDashboard page (frontend/src/pages/AdminDashboard.tsx). This tab should display a table of all advertisements (title, placement, active status, expiry, link) with actions to toggle active/inactive and delete each ad. Include a 'Create New Ad' button that opens a modal/form where the admin can enter title, image URL, link URL, placement (dropdown), and optional expiry date. Show a success or error toast notification after each action.",
+      "target": "frontend",
+      "source": {
+        "messageIds": [
+          "msg-1"
+        ],
+        "quotes": [
+          "administrator can be able to add advertisement pages",
+          "monetisation"
+        ]
+      },
+      "acceptanceCriteria": [
+        "Advertisements tab is visible in AdminDashboard and only accessible to admins via AdminGuard",
+        "Table lists all ads with title, placement, active status, expiry, and link URL",
+        "Toggle active/inactive action updates the ad status immediately with toast feedback",
+        "Delete action removes the ad from the list with toast feedback",
+        "Create New Ad button opens a form/modal with fields: title, image URL, link URL, placement dropdown, optional expiry date",
+        "Submitting the create form creates a new ad and refreshes the ads list",
+        "Form validates required fields before submission"
       ]
     }
   ],
   "constraints": [
-    "Do not modify files under frontend/src/hooks/useInternetIdentity.ts, frontend/src/hooks/useActor.ts, frontend/src/main.tsx, or frontend/src/components/ui.",
-    "Preserve all other existing job type categories (e.g., Artisan, Full-Time, Part-Time) unchanged."
+    "All advertisement CRUD operations must be restricted to admin users using the existing role-based access control in backend/main.mo",
+    "Do not modify files in frontend/src/hooks/useInternetIdentity.ts, frontend/src/hooks/useActor.ts, frontend/src/main.tsx, or frontend/src/components/ui",
+    "AdBanner must not break existing page layouts or obstruct primary job board content"
   ],
   "nonGoals": [
-    "Adding any new job type categories beyond renaming Short-Time to NYSC (Youth Corps).",
-    "Changing the visual design or layout of the job type section.",
-    "Migrating or transforming existing job listing data stored in the backend canister."
+    "Payment processing or billing for advertisers",
+    "Automated ad impression or click analytics",
+    "Third-party ad network integrations (e.g., Google Ads)",
+    "Advertiser self-service portal (admin-only management)"
   ],
   "imageRequirements": {
     "required": [],

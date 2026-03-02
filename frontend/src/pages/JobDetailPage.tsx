@@ -15,6 +15,8 @@ import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
 import { Skeleton } from '@/components/ui/skeleton';
 import { StarRating } from '../components/RatingDisplay';
+import AdBanner from '../components/AdBanner';
+import { AdvertisementPlacement } from '../backend';
 import {
   MapPin,
   DollarSign,
@@ -106,8 +108,8 @@ export default function JobDetailPage() {
     );
   }
 
-  const typeLabel = JOB_TYPE_LABELS[job.jobType] || job.jobType;
-  const typeColor = JOB_TYPE_COLORS[job.jobType] || 'bg-secondary text-secondary-foreground';
+  const typeLabel = JOB_TYPE_LABELS[job.jobType as string] || String(job.jobType);
+  const typeColor = JOB_TYPE_COLORS[job.jobType as string] || 'bg-secondary text-secondary-foreground';
 
   return (
     <div className="container mx-auto px-4 py-8 max-w-3xl">
@@ -158,7 +160,7 @@ export default function JobDetailPage() {
           </span>
           <span className="flex items-center gap-1.5">
             <DollarSign className="w-4 h-4 text-primary" />
-            ${Number(job.pay).toLocaleString()}
+            ₦{Number(job.pay).toLocaleString()}
           </span>
           <span className="flex items-center gap-1.5">
             <Clock className="w-4 h-4 text-primary" />
@@ -219,6 +221,9 @@ export default function JobDetailPage() {
           </div>
         </div>
       )}
+
+      {/* Ad Banner below job details */}
+      <AdBanner placement={AdvertisementPlacement.jobDetail} className="mb-4" />
 
       {/* Application Section */}
       {!job.active ? (

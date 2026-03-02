@@ -150,6 +150,7 @@ export default function JobPostingForm() {
                 <SelectItem value={JobType.partTime}>Part-Time</SelectItem>
                 <SelectItem value={JobType.nysc}>NYSC (Youth Corps)</SelectItem>
                 <SelectItem value={JobType.artisan}>Artisan</SelectItem>
+                <SelectItem value={JobType.shortTerm}>Short-Term</SelectItem>
               </SelectContent>
             </Select>
           </div>

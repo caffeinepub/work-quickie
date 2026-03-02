@@ -8,6 +8,17 @@
 
 import { IDL } from '@icp-sdk/core/candid';
 
+export const _CaffeineStorageCreateCertificateResult = IDL.Record({
+  'method' : IDL.Text,
+  'blob_hash' : IDL.Text,
+});
+export const _CaffeineStorageRefillInformation = IDL.Record({
+  'proposed_top_up_amount' : IDL.Opt(IDL.Nat),
+});
+export const _CaffeineStorageRefillResult = IDL.Record({
+  'success' : IDL.Opt(IDL.Bool),
+  'topped_up_amount' : IDL.Opt(IDL.Nat),
+});
 export const Analytics = IDL.Record({
   'totalSeekers' : IDL.Nat,
   'totalJobs' : IDL.Nat,
@@ -56,6 +67,24 @@ export const UserRole = IDL.Variant({
   'user' : IDL.Null,
   'guest' : IDL.Null,
 });
+export const ExternalBlob = IDL.Vec(IDL.Nat8);
+export const AdvertisementPlacement = IDL.Variant({
+  'jobBoard' : IDL.Null,
+  'jobDetail' : IDL.Null,
+  'posterDashboard' : IDL.Null,
+  'seekerDashboard' : IDL.Null,
+  'landing' : IDL.Null,
+});
+export const Advertisement = IDL.Record({
+  'id' : IDL.Nat,
+  'title' : IDL.Text,
+  'expiresAt' : IDL.Opt(IDL.Int),
+  'linkUrl' : IDL.Text,
+  'placement' : AdvertisementPlacement,
+  'createdAt' : IDL.Int,
+  'isActive' : IDL.Bool,
+  'image' : ExternalBlob,
+});
 export const Application = IDL.Record({
   'status' : IDL.Text,
   'jobId' : IDL.Nat,
@@ -80,6 +109,32 @@ export const JobFilter = IDL.Record({
 });
 
 export const idlService = IDL.Service({
+  '_caffeineStorageBlobIsLive' : IDL.Func(
+      [IDL.Vec(IDL.Nat8)],
+      [IDL.Bool],
+      ['query'],
+    ),
+  '_caffeineStorageBlobsToDelete' : IDL.Func(
+      [],
+      [IDL.Vec(IDL.Vec(IDL.Nat8))],
+      ['query'],
+    ),
+  '_caffeineStorageConfirmBlobDeletion' : IDL.Func(
+      [IDL.Vec(IDL.Vec(IDL.Nat8))],
+      [],
+      [],
+    ),
+  '_caffeineStorageCreateCertificate' : IDL.Func(
+      [IDL.Text],
+      [_CaffeineStorageCreateCertificateResult],
+      [],
+    ),
+  '_caffeineStorageRefillCashier' : IDL.Func(
+      [IDL.Opt(_CaffeineStorageRefillInformation)],
+      [_CaffeineStorageRefillResult],
+      [],
+    ),
+  '_caffeineStorageUpdateGatewayPrincipals' : IDL.Func([], [], []),
   '_initializeAccessControlWithSecret' : IDL.Func([IDL.Text], [], []),
   'adminApproveJobListing' : IDL.Func([IDL.Nat], [], []),
   'adminGetAnalytics' : IDL.Func([], [Analytics], ['query']),
@@ -90,6 +145,17 @@ export const idlService = IDL.Service({
   'adminVerifyPoster' : IDL.Func([IDL.Principal], [], []),
   'applyToJob' : IDL.Func([IDL.Nat, IDL.Text], [], []),
   'assignCallerUserRole' : IDL.Func([IDL.Principal, UserRole], [], []),
+  'createAd' : IDL.Func(
+      [
+        IDL.Text,
+        ExternalBlob,
+        IDL.Text,
+        AdvertisementPlacement,
+        IDL.Opt(IDL.Int),
+      ],
+      [IDL.Nat],
+      [],
+    ),
   'createJobListing' : IDL.Func(
       [IDL.Text, IDL.Text, IDL.Vec(IDL.Text), IDL.Text, IDL.Nat, JobType],
       [IDL.Nat],
@@ -107,6 +173,12 @@ export const idlService = IDL.Service({
       ],
       [],
       [],
+    ),
+  'deleteAd' : IDL.Func([IDL.Nat], [], []),
+  'getAdsByPlacement' : IDL.Func(
+      [AdvertisementPlacement],
+      [IDL.Vec(Advertisement)],
+      ['query'],
     ),
   'getApplicationsForJob' : IDL.Func(
       [IDL.Nat],
@@ -147,6 +219,19 @@ export const idlService = IDL.Service({
   'saveCallerUserProfile' : IDL.Func([UserProfile], [], []),
   'searchJobs' : IDL.Func([JobFilter], [IDL.Vec(JobListing)], ['query']),
   'submitRating' : IDL.Func([IDL.Principal, IDL.Nat, IDL.Text], [], []),
+  'toggleAdActive' : IDL.Func([IDL.Nat, IDL.Bool], [], []),
+  'updateAd' : IDL.Func(
+      [
+        IDL.Nat,
+        IDL.Text,
+        ExternalBlob,
+        IDL.Text,
+        AdvertisementPlacement,
+        IDL.Opt(IDL.Int),
+      ],
+      [],
+      [],
+    ),
   'updateApplicationStatus' : IDL.Func(
       [IDL.Nat, IDL.Principal, IDL.Text],
       [],
@@ -159,6 +244,17 @@ export const idlService = IDL.Service({
 export const idlInitArgs = [];
 
 export const idlFactory = ({ IDL }) => {
+  const _CaffeineStorageCreateCertificateResult = IDL.Record({
+    'method' : IDL.Text,
+    'blob_hash' : IDL.Text,
+  });
+  const _CaffeineStorageRefillInformation = IDL.Record({
+    'proposed_top_up_amount' : IDL.Opt(IDL.Nat),
+  });
+  const _CaffeineStorageRefillResult = IDL.Record({
+    'success' : IDL.Opt(IDL.Bool),
+    'topped_up_amount' : IDL.Opt(IDL.Nat),
+  });
   const Analytics = IDL.Record({
     'totalSeekers' : IDL.Nat,
     'totalJobs' : IDL.Nat,
@@ -207,6 +303,24 @@ export const idlFactory = ({ IDL }) => {
     'user' : IDL.Null,
     'guest' : IDL.Null,
   });
+  const ExternalBlob = IDL.Vec(IDL.Nat8);
+  const AdvertisementPlacement = IDL.Variant({
+    'jobBoard' : IDL.Null,
+    'jobDetail' : IDL.Null,
+    'posterDashboard' : IDL.Null,
+    'seekerDashboard' : IDL.Null,
+    'landing' : IDL.Null,
+  });
+  const Advertisement = IDL.Record({
+    'id' : IDL.Nat,
+    'title' : IDL.Text,
+    'expiresAt' : IDL.Opt(IDL.Int),
+    'linkUrl' : IDL.Text,
+    'placement' : AdvertisementPlacement,
+    'createdAt' : IDL.Int,
+    'isActive' : IDL.Bool,
+    'image' : ExternalBlob,
+  });
   const Application = IDL.Record({
     'status' : IDL.Text,
     'jobId' : IDL.Nat,
@@ -231,6 +345,32 @@ export const idlFactory = ({ IDL }) => {
   });
   
   return IDL.Service({
+    '_caffeineStorageBlobIsLive' : IDL.Func(
+        [IDL.Vec(IDL.Nat8)],
+        [IDL.Bool],
+        ['query'],
+      ),
+    '_caffeineStorageBlobsToDelete' : IDL.Func(
+        [],
+        [IDL.Vec(IDL.Vec(IDL.Nat8))],
+        ['query'],
+      ),
+    '_caffeineStorageConfirmBlobDeletion' : IDL.Func(
+        [IDL.Vec(IDL.Vec(IDL.Nat8))],
+        [],
+        [],
+      ),
+    '_caffeineStorageCreateCertificate' : IDL.Func(
+        [IDL.Text],
+        [_CaffeineStorageCreateCertificateResult],
+        [],
+      ),
+    '_caffeineStorageRefillCashier' : IDL.Func(
+        [IDL.Opt(_CaffeineStorageRefillInformation)],
+        [_CaffeineStorageRefillResult],
+        [],
+      ),
+    '_caffeineStorageUpdateGatewayPrincipals' : IDL.Func([], [], []),
     '_initializeAccessControlWithSecret' : IDL.Func([IDL.Text], [], []),
     'adminApproveJobListing' : IDL.Func([IDL.Nat], [], []),
     'adminGetAnalytics' : IDL.Func([], [Analytics], ['query']),
@@ -241,6 +381,17 @@ export const idlFactory = ({ IDL }) => {
     'adminVerifyPoster' : IDL.Func([IDL.Principal], [], []),
     'applyToJob' : IDL.Func([IDL.Nat, IDL.Text], [], []),
     'assignCallerUserRole' : IDL.Func([IDL.Principal, UserRole], [], []),
+    'createAd' : IDL.Func(
+        [
+          IDL.Text,
+          ExternalBlob,
+          IDL.Text,
+          AdvertisementPlacement,
+          IDL.Opt(IDL.Int),
+        ],
+        [IDL.Nat],
+        [],
+      ),
     'createJobListing' : IDL.Func(
         [IDL.Text, IDL.Text, IDL.Vec(IDL.Text), IDL.Text, IDL.Nat, JobType],
         [IDL.Nat],
@@ -258,6 +409,12 @@ export const idlFactory = ({ IDL }) => {
         ],
         [],
         [],
+      ),
+    'deleteAd' : IDL.Func([IDL.Nat], [], []),
+    'getAdsByPlacement' : IDL.Func(
+        [AdvertisementPlacement],
+        [IDL.Vec(Advertisement)],
+        ['query'],
       ),
     'getApplicationsForJob' : IDL.Func(
         [IDL.Nat],
@@ -302,6 +459,19 @@ export const idlFactory = ({ IDL }) => {
     'saveCallerUserProfile' : IDL.Func([UserProfile], [], []),
     'searchJobs' : IDL.Func([JobFilter], [IDL.Vec(JobListing)], ['query']),
     'submitRating' : IDL.Func([IDL.Principal, IDL.Nat, IDL.Text], [], []),
+    'toggleAdActive' : IDL.Func([IDL.Nat, IDL.Bool], [], []),
+    'updateAd' : IDL.Func(
+        [
+          IDL.Nat,
+          IDL.Text,
+          ExternalBlob,
+          IDL.Text,
+          AdvertisementPlacement,
+          IDL.Opt(IDL.Int),
+        ],
+        [],
+        [],
+      ),
     'updateApplicationStatus' : IDL.Func(
         [IDL.Nat, IDL.Principal, IDL.Text],
         [],

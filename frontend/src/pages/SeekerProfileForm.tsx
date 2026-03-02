@@ -15,6 +15,7 @@ export default function SeekerProfileForm() {
   const navigate = useNavigate();
   const { identity } = useInternetIdentity();
   const { data: userProfile } = useGetCallerUserProfile();
+  // Pass Principal directly — hook now accepts Principal | string | null | undefined
   const { data: existingProfile } = useGetSeekerProfile(identity?.getPrincipal() ?? null);
   const createProfile = useCreateSeekerProfile();
 

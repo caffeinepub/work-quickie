@@ -6,12 +6,13 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { toast } from 'sonner';
-import { Building2, User, Phone } from 'lucide-react';
+import { Building2, User } from 'lucide-react';
 
 export default function PosterProfileForm() {
   const navigate = useNavigate();
   const { identity } = useInternetIdentity();
   const { data: userProfile } = useGetCallerUserProfile();
+  // Pass Principal directly — hook now accepts Principal | string | null | undefined
   const { data: existingProfile } = useGetPosterProfile(identity?.getPrincipal() ?? null);
   const createProfile = useCreatePosterProfile();
 

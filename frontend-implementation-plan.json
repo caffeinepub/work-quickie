@@ -1,62 +1,103 @@
 {
   "kind": "implementation_plan",
   "version": "1.0",
-  "title": "Replace 'Short-Time' with 'NYSC (Youth Corps)' section",
+  "title": "Admin Advertisement Management System for Monetisation - Frontend",
   "requirements": [
     {
-      "id": "REQ-1",
-      "summary": "Replace all occurrences of the job type label 'Short-Time' with 'NYSC (Youth Corps)' across the entire frontend, including job type badges, filter dropdowns, selection options, and any display text where 'Short-Time' appears as a job category or section label.",
+      "id": "REQ-2",
+      "summary": "Add TanStack Query hooks for advertisement operations",
       "acceptanceCriteria": [
-        "The label 'Short-Time' no longer appears anywhere in the UI.",
-        "The label 'NYSC (Youth Corps)' appears in all places where 'Short-Time' previously appeared, including job type badges on LandingPage.tsx, filter dropdowns in JobFilters.tsx, and type selectors in JobPostingForm.tsx.",
-        "Job listings previously categorized as 'Short-Time' now display as 'NYSC (Youth Corps)'.",
-        "The visual styling and layout of the replaced label matches the style of the other job type labels (e.g., Artisan)."
+        "useGetAdsByPlacement fetches ads for a given placement and caches correctly",
+        "Mutation hooks (useCreateAd, useUpdateAd, useDeleteAd, useToggleAdActive) invalidate relevant queries on success",
+        "Hooks follow existing patterns in useQueries.ts"
       ],
       "file_operations": [
         {
-          "path": "frontend/src/components/LandingPage.tsx",
+          "path": "frontend/src/hooks/useQueries.ts",
           "operation": "modify",
-          "description": "Update the job type badge display in the hero section to replace 'Short-Time' with 'NYSC (Youth Corps)', ensuring the label and associated icon reflect the new category name while maintaining consistent styling with other job type badges."
-        },
+          "description": "Add advertisement query and mutation hooks: useGetAdsByPlacement(placement: AdvertisementPlacement) query hook that fetches active ads for a placement; useCreateAd mutation hook accepting title, image (ExternalBlob), linkUrl, placement, and optional expiresAt; useUpdateAd mutation hook accepting adId and the same fields as create; useDeleteAd mutation hook accepting adId; useToggleAdActive mutation hook accepting adId and isActive boolean. All mutation hooks must invalidate the 'adsByPlacement' query key on success. Follow existing query/mutation patterns in the file, including error handling and toast notifications."
+        }
+      ]
+    },
+    {
+      "id": "REQ-3",
+      "summary": "Create reusable AdBanner component for displaying ads",
+      "acceptanceCriteria": [
+        "AdBanner renders nothing when no active ads are available for a placement",
+        "AdBanner displays ad image, title, and external link when ads are active",
+        "A visible 'Advertisement' label is shown on the banner",
+        "The banner is dismissible by the user within the session",
+        "Component accepts a placement prop matching the backend placement enum"
+      ],
+      "file_operations": [
         {
-          "path": "frontend/src/components/JobFilters.tsx",
-          "operation": "modify",
-          "description": "Update the job type select dropdown options to replace 'Short-Time' with 'NYSC (Youth Corps)', ensuring the value sent to the backend matches the updated JobType enum variant 'nysc' and the display text shows 'NYSC (Youth Corps)'."
-        },
-        {
-          "path": "frontend/src/pages/JobPostingForm.tsx",
-          "operation": "modify",
-          "description": "Update the job type selector in the job posting form to replace 'Short-Time' with 'NYSC (Youth Corps)' in the dropdown options, ensuring the form sends the correct 'nysc' value to the backend when this type is selected."
-        },
-        {
-          "path": "frontend/src/components/JobListingCard.tsx",
-          "operation": "modify",
-          "description": "Update the job type badge rendering logic to display 'NYSC (Youth Corps)' instead of 'Short-Time' when the job type is 'nysc', maintaining consistent badge styling and color with other job type categories."
-        },
+          "path": "frontend/src/components/AdBanner.tsx",
+          "operation": "create",
+          "description": "Create a reusable AdBanner component that accepts a placement prop of type AdvertisementPlacement. Use the useGetAdsByPlacement hook to fetch active ads for the given placement. If no ads are returned or the query is loading, render nothing. If ads exist, display the first active ad in a dismissible card with: the ad image using ExternalBlob.getDirectURL() in an img tag; the ad title; an external link (target='_blank' rel='noopener noreferrer') to linkUrl; a subtle 'Advertisement' label for transparency. Implement session-based dismissal using useState and an X/close button. Use Card component from shadcn/ui for styling and ensure the banner is non-intrusive and responsive."
+        }
+      ]
+    },
+    {
+      "id": "REQ-4",
+      "summary": "Integrate AdBanner into appropriate app areas",
+      "acceptanceCriteria": [
+        "AdBanner appears in JobBoard with placement='jobBoard'",
+        "AdBanner appears in JobDetailPage with placement='jobDetail'",
+        "AdBanner appears in LandingPage with placement='landing'",
+        "AdBanner appears in SeekerDashboard with placement='seekerDashboard'",
+        "AdBanner appears in PosterDashboard with placement='posterDashboard'",
+        "Banners are non-intrusive and do not obstruct primary app content"
+      ],
+      "file_operations": [
         {
           "path": "frontend/src/pages/JobBoard.tsx",
           "operation": "modify",
-          "description": "Review and update any job type display logic or filtering UI elements in the job board to ensure 'NYSC (Youth Corps)' is consistently displayed instead of 'Short-Time' for the 'nysc' job type."
+          "description": "Import and place an AdBanner component with placement='jobBoard' above or between the job listing grid. Ensure the banner does not obstruct the primary job listing content or filter sidebar."
         },
         {
           "path": "frontend/src/pages/JobDetailPage.tsx",
           "operation": "modify",
-          "description": "Update the job type display in the job detail view to show 'NYSC (Youth Corps)' instead of 'Short-Time' when rendering job listing details for 'nysc' type jobs."
+          "description": "Import and place an AdBanner component with placement='jobDetail' below the main job details section and above or alongside the application form. Ensure it does not obstruct the job details or application functionality."
         },
         {
-          "path": "frontend/src/pages/PosterDashboard.tsx",
+          "path": "frontend/src/components/LandingPage.tsx",
           "operation": "modify",
-          "description": "Update any job type display or filtering logic in the poster dashboard to show 'NYSC (Youth Corps)' instead of 'Short-Time' for 'nysc' type job listings."
+          "description": "Import and place an AdBanner component with placement='landing' below the hero section and before the feature highlights. Ensure it integrates smoothly with the existing landing page layout."
         },
         {
           "path": "frontend/src/pages/SeekerDashboard.tsx",
           "operation": "modify",
-          "description": "Update any job type display or matched job filtering UI in the seeker dashboard to show 'NYSC (Youth Corps)' instead of 'Short-Time' for 'nysc' type jobs."
+          "description": "Import and place an AdBanner component with placement='seekerDashboard' at the top of the main content area, above the profile section and tabs. Ensure it does not obstruct dashboard navigation or primary content."
         },
+        {
+          "path": "frontend/src/pages/PosterDashboard.tsx",
+          "operation": "modify",
+          "description": "Import and place an AdBanner component with placement='posterDashboard' at the top of the main content area, above the profile section and tabs. Ensure it does not obstruct dashboard navigation or primary content."
+        }
+      ]
+    },
+    {
+      "id": "REQ-5",
+      "summary": "Add Advertisements management tab to AdminDashboard",
+      "acceptanceCriteria": [
+        "Advertisements tab is visible in AdminDashboard and only accessible to admins via AdminGuard",
+        "Table lists all ads with title, placement, active status, expiry, and link URL",
+        "Toggle active/inactive action updates the ad status immediately with toast feedback",
+        "Delete action removes the ad from the list with toast feedback",
+        "Create New Ad button opens a form/modal with fields: title, image URL, link URL, placement dropdown, optional expiry date",
+        "Submitting the create form creates a new ad and refreshes the ads list",
+        "Form validates required fields before submission"
+      ],
+      "file_operations": [
         {
           "path": "frontend/src/pages/AdminDashboard.tsx",
           "operation": "modify",
-          "description": "Update the job type display in the admin job listings table to show 'NYSC (Youth Corps)' instead of 'Short-Time' for 'nysc' type jobs, ensuring consistency across the admin interface."
+          "description": "Add a new 'Advertisements' tab to the existing Tabs component. In this tab, display a table listing all advertisements across all placements using a new useGetAllAds query hook (to be added to useQueries.ts). The table should show columns: title, placement (human-readable enum label), active status (badge), expiry date (formatted or 'Never'), link URL, and actions column with toggle active/inactive button (using useToggleAdActive) and delete button (using useDeleteAd). Include a 'Create New Ad' button above the table that opens a Dialog or Sheet modal containing a form with fields: title (text input), image URL (text input for ExternalBlob.fromURL), link URL (text input with URL validation), placement (Select dropdown with all AdvertisementPlacement enum values), and optional expiry date (DatePicker or text input for timestamp). Use react-hook-form for form validation and the useCreateAd mutation hook on submit. Show toast notifications on success or error for all actions. Ensure the tab and all admin actions are protected by the existing AdminGuard wrapper."
+        },
+        {
+          "path": "frontend/src/hooks/useQueries.ts",
+          "operation": "modify",
+          "description": "Add a useGetAllAds query hook that fetches advertisements across all placements. Since the backend only provides getAdsByPlacement, implement this hook by either: (1) making multiple parallel queries for each placement enum value and combining results, or (2) fetching ads for each placement in sequence. Cache the combined result under a 'allAds' query key. This hook will be used by the AdminDashboard Advertisements tab to list all ads regardless of placement. Ensure the query is enabled only when the actor is available."
         }
       ]
     }

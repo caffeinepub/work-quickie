@@ -1,59 +1,58 @@
 {
   "kind": "spec_vs_diff_report",
   "version": "1.0",
-  "generatedAt": "2026-03-01T08:56:02.972Z",
-  "summary": "The diff implements most of REQ-1 and REQ-2 successfully. Frontend labels are updated from 'Short-Time' to 'NYSC (Youth Corps)' in LandingPage, JobFilters, JobListingCard, JobDetailPage, AdminDashboard, and JobPostingForm. The backend main.mo defines a new #nysc variant and a migration module is added. However, residual 'shortTerm' references remain in frontend label maps displaying 'Short-Term', and the shortTerm variant still appears in both the backend enum and migration module alongside #nysc, meaning the old variant was not fully removed.",
+  "generatedAt": "2026-03-02T08:59:11.824Z",
+  "summary": "The diff implements most of the requested advertisement management system. REQ-2, REQ-3, REQ-4, and REQ-5 appear substantially implemented. REQ-1 (backend) is partially visible but the Advertisement type uses 'image: Storage.ExternalBlob' instead of the specified 'imageUrl: Text' field, and the backend CRUD functions are truncated. AdBanner.tsx calls 'ad.image.getDirectURL()' instead of using 'ad.imageUrl' as specified. AdminDashboard does not import or use useUpdateAd, so the update action is missing from the admin UI.",
   "missing_requirements": [
     {
-      "id": "REQ-2",
-      "requirement": "The backend no longer defines or accepts a 'ShortTime' job type variant.",
-      "reason": "The backend main.mo JobType enum still includes #shortTerm alongside #nysc. The migration module also defines NewJobType with both #shortTerm and #nysc variants. The old short-term variant was not removed, only a new #nysc variant was added alongside it.",
+      "id": "REQ-1",
+      "requirement": "Advertisement data type must have field 'imageUrl: Text'. The backend CRUD implementations (createAd, updateAd, deleteAd, toggleAdActive, getAdsByPlacement) are not confirmed visible in the truncated diff.",
+      "reason": "The visible backend diff shows 'image: Storage.ExternalBlob' instead of 'imageUrl: Text'. The function bodies are truncated and cannot be confirmed.",
       "evidence": [
-        "backend/main.mo",
-        "backend/migration.mo"
+        "backend/main.mo"
       ]
     },
     {
-      "id": "REQ-1",
-      "requirement": "The label 'Short-Time' no longer appears anywhere in the UI.",
-      "reason": "Frontend JOB_TYPE_LABELS maps in JobListingCard.tsx, JobDetailPage.tsx, and AdminDashboard.tsx still include a 'shortTerm: Short-Term' entry. While 'Short-Time' is replaced, 'Short-Term' remains as a displayable label for the shortTerm job type and could still appear in the UI.",
+      "id": "REQ-5",
+      "requirement": "Admin table should support editing/updating ad fields via useUpdateAd.",
+      "reason": "AdminDashboard.tsx imports only useCreateAd, useDeleteAd, and useToggleAdActive. useUpdateAd is not imported or used, so no update/edit action exists in the admin UI.",
       "evidence": [
-        "frontend/src/components/JobListingCard.tsx",
-        "frontend/src/pages/JobDetailPage.tsx",
         "frontend/src/pages/AdminDashboard.tsx"
       ]
     }
   ],
   "hallucinated_features": [
     {
-      "description": "A migration module (backend/migration.mo) was added to handle data migration from old text-based job types to the new enum variants, and main.mo applies it via (with migration = Migration.run).",
-      "reason": "The build request explicitly states as a non-goal: 'Migrating or transforming existing job listing data stored in the backend canister.' The migration.mo file and its invocation in main.mo implement exactly this non-goal.",
+      "description": "AdBanner renders the ad image using 'ad.image.getDirectURL()', treating the image as a blob object with a method call rather than a plain imageUrl string.",
+      "reason": "The spec defines the Advertisement type with 'imageUrl: Text', a plain URL string. The ExternalBlob pattern with getDirectURL() was not requested.",
       "evidence": [
-        "backend/migration.mo",
-        "backend/main.mo"
+        "frontend/src/components/AdBanner.tsx"
       ]
     },
     {
-      "description": "A new #shortTerm variant was retained in the backend JobType enum alongside #nysc, making it a distinct separate job type.",
-      "reason": "The build request asked only to rename ShortTime to NYSC while preserving other existing categories. Keeping shortTerm as a separate variant alongside nysc goes beyond a simple rename and contradicts REQ-2's requirement to remove the ShortTime variant.",
+      "description": "The Advertisement backend type uses 'image: Storage.ExternalBlob' via a blob-storage mixin instead of the specified 'imageUrl: Text' field.",
+      "reason": "The build request explicitly specifies 'imageUrl' as a Text field. Using ExternalBlob is an unrequested architectural deviation.",
       "evidence": [
-        "backend/main.mo",
-        "backend/migration.mo"
+        "backend/main.mo"
       ]
     }
   ],
-  "confidence": 0.78,
+  "confidence": 0.72,
   "changed_files": [
     "backend/main.mo",
-    "backend/migration.mo",
     "frontend-file-summaries.txt",
-    "frontend/src/components/JobFilters.tsx",
-    "frontend/src/components/JobListingCard.tsx",
+    "frontend/src/components/AdBanner.tsx",
     "frontend/src/components/LandingPage.tsx",
     "frontend/src/hooks/useQueries.ts",
     "frontend/src/pages/AdminDashboard.tsx",
+    "frontend/src/pages/JobApplicantsView.tsx",
+    "frontend/src/pages/JobBoard.tsx",
     "frontend/src/pages/JobDetailPage.tsx",
     "frontend/src/pages/JobPostingForm.tsx",
+    "frontend/src/pages/PosterDashboard.tsx",
+    "frontend/src/pages/PosterProfileForm.tsx",
+    "frontend/src/pages/SeekerDashboard.tsx",
+    "frontend/src/pages/SeekerProfileForm.tsx",
     "project_state.json"
   ]
 }

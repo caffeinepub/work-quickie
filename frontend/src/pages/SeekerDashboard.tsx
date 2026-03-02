@@ -15,7 +15,9 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import ApplicationsList from '../components/ApplicationsList';
 import JobListingCard from '../components/JobListingCard';
 import RatingDisplay from '../components/RatingDisplay';
-import { Edit, MapPin, Link as LinkIcon, Star, Briefcase, Zap, CheckCircle, XCircle } from 'lucide-react';
+import AdBanner from '../components/AdBanner';
+import { AdvertisementPlacement } from '../backend';
+import { Edit, Link as LinkIcon, Star, Briefcase, Zap, CheckCircle, XCircle } from 'lucide-react';
 import { toast } from 'sonner';
 
 export default function SeekerDashboard() {
@@ -62,6 +64,9 @@ export default function SeekerDashboard() {
 
   return (
     <div className="container mx-auto px-4 py-8 max-w-5xl">
+      {/* Ad Banner */}
+      <AdBanner placement={AdvertisementPlacement.seekerDashboard} className="mb-6" />
+
       {/* Profile Header */}
       <div className="bg-card rounded-xl border border-border card-shadow p-6 mb-6">
         <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">

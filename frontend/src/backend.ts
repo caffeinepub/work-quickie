@@ -102,13 +102,6 @@ export interface Rating {
     comment: string;
     timestamp: bigint;
 }
-export interface Analytics {
-    totalSeekers: bigint;
-    totalJobs: bigint;
-    averageRating: number;
-    totalPosters: bigint;
-    totalApplications: bigint;
-}
 export interface JobFilter {
     jobType?: JobType;
     minPay?: bigint;
@@ -117,15 +110,8 @@ export interface JobFilter {
     skills?: Array<string>;
     location?: string;
 }
-export interface SeekerProfile {
-    id: Principal;
-    bio: string;
-    name: string;
-    qualifications: Array<string>;
-    available: boolean;
-    experience: string;
-    portfolioUrl: string;
-    skills: Array<string>;
+export interface _CaffeineStorageRefillInformation {
+    proposed_top_up_amount?: bigint;
 }
 export interface JobListing {
     id: bigint;
@@ -139,6 +125,37 @@ export interface JobListing {
     requiredSkills: Array<string>;
     location: string;
 }
+export interface _CaffeineStorageCreateCertificateResult {
+    method: string;
+    blob_hash: string;
+}
+export interface Advertisement {
+    id: bigint;
+    title: string;
+    expiresAt?: bigint;
+    linkUrl: string;
+    placement: AdvertisementPlacement;
+    createdAt: bigint;
+    isActive: boolean;
+    image: ExternalBlob;
+}
+export interface Analytics {
+    totalSeekers: bigint;
+    totalJobs: bigint;
+    averageRating: number;
+    totalPosters: bigint;
+    totalApplications: bigint;
+}
+export interface SeekerProfile {
+    id: Principal;
+    bio: string;
+    name: string;
+    qualifications: Array<string>;
+    available: boolean;
+    experience: string;
+    portfolioUrl: string;
+    skills: Array<string>;
+}
 export interface PosterProfile {
     id: Principal;
     verified: boolean;
@@ -149,6 +166,17 @@ export interface PosterProfile {
 export interface UserProfile {
     name: string;
     role: string;
+}
+export interface _CaffeineStorageRefillResult {
+    success?: boolean;
+    topped_up_amount?: bigint;
+}
+export enum AdvertisementPlacement {
+    jobBoard = "jobBoard",
+    jobDetail = "jobDetail",
+    posterDashboard = "posterDashboard",
+    seekerDashboard = "seekerDashboard",
+    landing = "landing"
 }
 export enum JobType {
     nysc = "nysc",
@@ -163,6 +191,12 @@ export enum UserRole {
     guest = "guest"
 }
 export interface backendInterface {
+    _caffeineStorageBlobIsLive(hash: Uint8Array): Promise<boolean>;
+    _caffeineStorageBlobsToDelete(): Promise<Array<Uint8Array>>;
+    _caffeineStorageConfirmBlobDeletion(blobs: Array<Uint8Array>): Promise<void>;
+    _caffeineStorageCreateCertificate(blobHash: string): Promise<_CaffeineStorageCreateCertificateResult>;
+    _caffeineStorageRefillCashier(refillInformation: _CaffeineStorageRefillInformation | null): Promise<_CaffeineStorageRefillResult>;
+    _caffeineStorageUpdateGatewayPrincipals(): Promise<void>;
     _initializeAccessControlWithSecret(userSecret: string): Promise<void>;
     adminApproveJobListing(jobId: bigint): Promise<void>;
     adminGetAnalytics(): Promise<Analytics>;
@@ -173,9 +207,12 @@ export interface backendInterface {
     adminVerifyPoster(posterId: Principal): Promise<void>;
     applyToJob(jobId: bigint, message: string): Promise<void>;
     assignCallerUserRole(user: Principal, role: UserRole): Promise<void>;
+    createAd(title: string, image: ExternalBlob, linkUrl: string, placement: AdvertisementPlacement, expiresAt: bigint | null): Promise<bigint>;
     createJobListing(title: string, description: string, requiredSkills: Array<string>, location: string, pay: bigint, jobType: JobType): Promise<bigint>;
     createPosterProfile(name: string, companyName: string, contactInfo: string): Promise<void>;
     createSeekerProfile(name: string, bio: string, skills: Array<string>, qualifications: Array<string>, experience: string, portfolioUrl: string): Promise<void>;
+    deleteAd(adId: bigint): Promise<void>;
+    getAdsByPlacement(placement: AdvertisementPlacement): Promise<Array<Advertisement>>;
     getApplicationsForJob(jobId: bigint): Promise<Array<Application>>;
     getAverageRatingForUser(userId: Principal): Promise<number>;
     getCallerUserProfile(): Promise<UserProfile | null>;
@@ -191,13 +228,99 @@ export interface backendInterface {
     saveCallerUserProfile(profile: UserProfile): Promise<void>;
     searchJobs(filter: JobFilter): Promise<Array<JobListing>>;
     submitRating(revieweeId: Principal, score: bigint, comment: string): Promise<void>;
+    toggleAdActive(adId: bigint, isActive: boolean): Promise<void>;
+    updateAd(adId: bigint, title: string, image: ExternalBlob, linkUrl: string, placement: AdvertisementPlacement, expiresAt: bigint | null): Promise<void>;
     updateApplicationStatus(jobId: bigint, seekerId: Principal, newStatus: string): Promise<void>;
     updateJobListingStatus(jobId: bigint, active: boolean): Promise<void>;
     updateSeekerAvailability(available: boolean): Promise<void>;
 }
-import type { JobFilter as _JobFilter, JobListing as _JobListing, JobType as _JobType, PosterProfile as _PosterProfile, SeekerProfile as _SeekerProfile, UserProfile as _UserProfile, UserRole as _UserRole } from "./declarations/backend.did.d.ts";
+import type { Advertisement as _Advertisement, AdvertisementPlacement as _AdvertisementPlacement, ExternalBlob as _ExternalBlob, JobFilter as _JobFilter, JobListing as _JobListing, JobType as _JobType, PosterProfile as _PosterProfile, SeekerProfile as _SeekerProfile, UserProfile as _UserProfile, UserRole as _UserRole, _CaffeineStorageRefillInformation as __CaffeineStorageRefillInformation, _CaffeineStorageRefillResult as __CaffeineStorageRefillResult } from "./declarations/backend.did.d.ts";
 export class Backend implements backendInterface {
     constructor(private actor: ActorSubclass<_SERVICE>, private _uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, private _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, private processError?: (error: unknown) => never){}
+    async _caffeineStorageBlobIsLive(arg0: Uint8Array): Promise<boolean> {
+        if (this.processError) {
+            try {
+                const result = await this.actor._caffeineStorageBlobIsLive(arg0);
+                return result;
+            } catch (e) {
+                this.processError(e);
+                throw new Error("unreachable");
+            }
+        } else {
+            const result = await this.actor._caffeineStorageBlobIsLive(arg0);
+            return result;
+        }
+    }
+    async _caffeineStorageBlobsToDelete(): Promise<Array<Uint8Array>> {
+        if (this.processError) {
+            try {
+                const result = await this.actor._caffeineStorageBlobsToDelete();
+                return result;
+            } catch (e) {
+                this.processError(e);
+                throw new Error("unreachable");
+            }
+        } else {
+            const result = await this.actor._caffeineStorageBlobsToDelete();
+            return result;
+        }
+    }
+    async _caffeineStorageConfirmBlobDeletion(arg0: Array<Uint8Array>): Promise<void> {
+        if (this.processError) {
+            try {
+                const result = await this.actor._caffeineStorageConfirmBlobDeletion(arg0);
+                return result;
+            } catch (e) {
+                this.processError(e);
+                throw new Error("unreachable");
+            }
+        } else {
+            const result = await this.actor._caffeineStorageConfirmBlobDeletion(arg0);
+            return result;
+        }
+    }
+    async _caffeineStorageCreateCertificate(arg0: string): Promise<_CaffeineStorageCreateCertificateResult> {
+        if (this.processError) {
+            try {
+                const result = await this.actor._caffeineStorageCreateCertificate(arg0);
+                return result;
+            } catch (e) {
+                this.processError(e);
+                throw new Error("unreachable");
+            }
+        } else {
+            const result = await this.actor._caffeineStorageCreateCertificate(arg0);
+            return result;
+        }
+    }
+    async _caffeineStorageRefillCashier(arg0: _CaffeineStorageRefillInformation | null): Promise<_CaffeineStorageRefillResult> {
+        if (this.processError) {
+            try {
+                const result = await this.actor._caffeineStorageRefillCashier(to_candid_opt_n1(this._uploadFile, this._downloadFile, arg0));
+                return from_candid__CaffeineStorageRefillResult_n4(this._uploadFile, this._downloadFile, result);
+            } catch (e) {
+                this.processError(e);
+                throw new Error("unreachable");
+            }
+        } else {
+            const result = await this.actor._caffeineStorageRefillCashier(to_candid_opt_n1(this._uploadFile, this._downloadFile, arg0));
+            return from_candid__CaffeineStorageRefillResult_n4(this._uploadFile, this._downloadFile, result);
+        }
+    }
+    async _caffeineStorageUpdateGatewayPrincipals(): Promise<void> {
+        if (this.processError) {
+            try {
+                const result = await this.actor._caffeineStorageUpdateGatewayPrincipals();
+                return result;
+            } catch (e) {
+                this.processError(e);
+                throw new Error("unreachable");
+            }
+        } else {
+            const result = await this.actor._caffeineStorageUpdateGatewayPrincipals();
+            return result;
+        }
+    }
     async _initializeAccessControlWithSecret(arg0: string): Promise<void> {
         if (this.processError) {
             try {
@@ -244,14 +367,14 @@ export class Backend implements backendInterface {
         if (this.processError) {
             try {
                 const result = await this.actor.adminListJobListings();
-                return from_candid_vec_n1(this._uploadFile, this._downloadFile, result);
+                return from_candid_vec_n8(this._uploadFile, this._downloadFile, result);
             } catch (e) {
                 this.processError(e);
                 throw new Error("unreachable");
             }
         } else {
             const result = await this.actor.adminListJobListings();
-            return from_candid_vec_n1(this._uploadFile, this._downloadFile, result);
+            return from_candid_vec_n8(this._uploadFile, this._downloadFile, result);
         }
     }
     async adminListPosters(): Promise<Array<PosterProfile>> {
@@ -327,28 +450,42 @@ export class Backend implements backendInterface {
     async assignCallerUserRole(arg0: Principal, arg1: UserRole): Promise<void> {
         if (this.processError) {
             try {
-                const result = await this.actor.assignCallerUserRole(arg0, to_candid_UserRole_n6(this._uploadFile, this._downloadFile, arg1));
+                const result = await this.actor.assignCallerUserRole(arg0, to_candid_UserRole_n13(this._uploadFile, this._downloadFile, arg1));
                 return result;
             } catch (e) {
                 this.processError(e);
                 throw new Error("unreachable");
             }
         } else {
-            const result = await this.actor.assignCallerUserRole(arg0, to_candid_UserRole_n6(this._uploadFile, this._downloadFile, arg1));
+            const result = await this.actor.assignCallerUserRole(arg0, to_candid_UserRole_n13(this._uploadFile, this._downloadFile, arg1));
+            return result;
+        }
+    }
+    async createAd(arg0: string, arg1: ExternalBlob, arg2: string, arg3: AdvertisementPlacement, arg4: bigint | null): Promise<bigint> {
+        if (this.processError) {
+            try {
+                const result = await this.actor.createAd(arg0, await to_candid_ExternalBlob_n15(this._uploadFile, this._downloadFile, arg1), arg2, to_candid_AdvertisementPlacement_n16(this._uploadFile, this._downloadFile, arg3), to_candid_opt_n18(this._uploadFile, this._downloadFile, arg4));
+                return result;
+            } catch (e) {
+                this.processError(e);
+                throw new Error("unreachable");
+            }
+        } else {
+            const result = await this.actor.createAd(arg0, await to_candid_ExternalBlob_n15(this._uploadFile, this._downloadFile, arg1), arg2, to_candid_AdvertisementPlacement_n16(this._uploadFile, this._downloadFile, arg3), to_candid_opt_n18(this._uploadFile, this._downloadFile, arg4));
             return result;
         }
     }
     async createJobListing(arg0: string, arg1: string, arg2: Array<string>, arg3: string, arg4: bigint, arg5: JobType): Promise<bigint> {
         if (this.processError) {
             try {
-                const result = await this.actor.createJobListing(arg0, arg1, arg2, arg3, arg4, to_candid_JobType_n8(this._uploadFile, this._downloadFile, arg5));
+                const result = await this.actor.createJobListing(arg0, arg1, arg2, arg3, arg4, to_candid_JobType_n19(this._uploadFile, this._downloadFile, arg5));
                 return result;
             } catch (e) {
                 this.processError(e);
                 throw new Error("unreachable");
             }
         } else {
-            const result = await this.actor.createJobListing(arg0, arg1, arg2, arg3, arg4, to_candid_JobType_n8(this._uploadFile, this._downloadFile, arg5));
+            const result = await this.actor.createJobListing(arg0, arg1, arg2, arg3, arg4, to_candid_JobType_n19(this._uploadFile, this._downloadFile, arg5));
             return result;
         }
     }
@@ -378,6 +515,34 @@ export class Backend implements backendInterface {
         } else {
             const result = await this.actor.createSeekerProfile(arg0, arg1, arg2, arg3, arg4, arg5);
             return result;
+        }
+    }
+    async deleteAd(arg0: bigint): Promise<void> {
+        if (this.processError) {
+            try {
+                const result = await this.actor.deleteAd(arg0);
+                return result;
+            } catch (e) {
+                this.processError(e);
+                throw new Error("unreachable");
+            }
+        } else {
+            const result = await this.actor.deleteAd(arg0);
+            return result;
+        }
+    }
+    async getAdsByPlacement(arg0: AdvertisementPlacement): Promise<Array<Advertisement>> {
+        if (this.processError) {
+            try {
+                const result = await this.actor.getAdsByPlacement(to_candid_AdvertisementPlacement_n16(this._uploadFile, this._downloadFile, arg0));
+                return from_candid_vec_n21(this._uploadFile, this._downloadFile, result);
+            } catch (e) {
+                this.processError(e);
+                throw new Error("unreachable");
+            }
+        } else {
+            const result = await this.actor.getAdsByPlacement(to_candid_AdvertisementPlacement_n16(this._uploadFile, this._downloadFile, arg0));
+            return from_candid_vec_n21(this._uploadFile, this._downloadFile, result);
         }
     }
     async getApplicationsForJob(arg0: bigint): Promise<Array<Application>> {
@@ -412,56 +577,56 @@ export class Backend implements backendInterface {
         if (this.processError) {
             try {
                 const result = await this.actor.getCallerUserProfile();
-                return from_candid_opt_n10(this._uploadFile, this._downloadFile, result);
+                return from_candid_opt_n28(this._uploadFile, this._downloadFile, result);
             } catch (e) {
                 this.processError(e);
                 throw new Error("unreachable");
             }
         } else {
             const result = await this.actor.getCallerUserProfile();
-            return from_candid_opt_n10(this._uploadFile, this._downloadFile, result);
+            return from_candid_opt_n28(this._uploadFile, this._downloadFile, result);
         }
     }
     async getCallerUserRole(): Promise<UserRole> {
         if (this.processError) {
             try {
                 const result = await this.actor.getCallerUserRole();
-                return from_candid_UserRole_n11(this._uploadFile, this._downloadFile, result);
+                return from_candid_UserRole_n29(this._uploadFile, this._downloadFile, result);
             } catch (e) {
                 this.processError(e);
                 throw new Error("unreachable");
             }
         } else {
             const result = await this.actor.getCallerUserRole();
-            return from_candid_UserRole_n11(this._uploadFile, this._downloadFile, result);
+            return from_candid_UserRole_n29(this._uploadFile, this._downloadFile, result);
         }
     }
     async getJobListing(arg0: bigint): Promise<JobListing | null> {
         if (this.processError) {
             try {
                 const result = await this.actor.getJobListing(arg0);
-                return from_candid_opt_n13(this._uploadFile, this._downloadFile, result);
+                return from_candid_opt_n31(this._uploadFile, this._downloadFile, result);
             } catch (e) {
                 this.processError(e);
                 throw new Error("unreachable");
             }
         } else {
             const result = await this.actor.getJobListing(arg0);
-            return from_candid_opt_n13(this._uploadFile, this._downloadFile, result);
+            return from_candid_opt_n31(this._uploadFile, this._downloadFile, result);
         }
     }
     async getMatchedJobsForSeeker(arg0: Principal): Promise<Array<JobListing>> {
         if (this.processError) {
             try {
                 const result = await this.actor.getMatchedJobsForSeeker(arg0);
-                return from_candid_vec_n1(this._uploadFile, this._downloadFile, result);
+                return from_candid_vec_n8(this._uploadFile, this._downloadFile, result);
             } catch (e) {
                 this.processError(e);
                 throw new Error("unreachable");
             }
         } else {
             const result = await this.actor.getMatchedJobsForSeeker(arg0);
-            return from_candid_vec_n1(this._uploadFile, this._downloadFile, result);
+            return from_candid_vec_n8(this._uploadFile, this._downloadFile, result);
         }
     }
     async getMyApplications(): Promise<Array<Application>> {
@@ -482,14 +647,14 @@ export class Backend implements backendInterface {
         if (this.processError) {
             try {
                 const result = await this.actor.getPosterProfile(arg0);
-                return from_candid_opt_n14(this._uploadFile, this._downloadFile, result);
+                return from_candid_opt_n32(this._uploadFile, this._downloadFile, result);
             } catch (e) {
                 this.processError(e);
                 throw new Error("unreachable");
             }
         } else {
             const result = await this.actor.getPosterProfile(arg0);
-            return from_candid_opt_n14(this._uploadFile, this._downloadFile, result);
+            return from_candid_opt_n32(this._uploadFile, this._downloadFile, result);
         }
     }
     async getRatingsForUser(arg0: Principal): Promise<Array<Rating>> {
@@ -510,28 +675,28 @@ export class Backend implements backendInterface {
         if (this.processError) {
             try {
                 const result = await this.actor.getSeekerProfile(arg0);
-                return from_candid_opt_n15(this._uploadFile, this._downloadFile, result);
+                return from_candid_opt_n33(this._uploadFile, this._downloadFile, result);
             } catch (e) {
                 this.processError(e);
                 throw new Error("unreachable");
             }
         } else {
             const result = await this.actor.getSeekerProfile(arg0);
-            return from_candid_opt_n15(this._uploadFile, this._downloadFile, result);
+            return from_candid_opt_n33(this._uploadFile, this._downloadFile, result);
         }
     }
     async getUserProfile(arg0: Principal): Promise<UserProfile | null> {
         if (this.processError) {
             try {
                 const result = await this.actor.getUserProfile(arg0);
-                return from_candid_opt_n10(this._uploadFile, this._downloadFile, result);
+                return from_candid_opt_n28(this._uploadFile, this._downloadFile, result);
             } catch (e) {
                 this.processError(e);
                 throw new Error("unreachable");
             }
         } else {
             const result = await this.actor.getUserProfile(arg0);
-            return from_candid_opt_n10(this._uploadFile, this._downloadFile, result);
+            return from_candid_opt_n28(this._uploadFile, this._downloadFile, result);
         }
     }
     async isCallerAdmin(): Promise<boolean> {
@@ -565,15 +730,15 @@ export class Backend implements backendInterface {
     async searchJobs(arg0: JobFilter): Promise<Array<JobListing>> {
         if (this.processError) {
             try {
-                const result = await this.actor.searchJobs(to_candid_JobFilter_n16(this._uploadFile, this._downloadFile, arg0));
-                return from_candid_vec_n1(this._uploadFile, this._downloadFile, result);
+                const result = await this.actor.searchJobs(to_candid_JobFilter_n34(this._uploadFile, this._downloadFile, arg0));
+                return from_candid_vec_n8(this._uploadFile, this._downloadFile, result);
             } catch (e) {
                 this.processError(e);
                 throw new Error("unreachable");
             }
         } else {
-            const result = await this.actor.searchJobs(to_candid_JobFilter_n16(this._uploadFile, this._downloadFile, arg0));
-            return from_candid_vec_n1(this._uploadFile, this._downloadFile, result);
+            const result = await this.actor.searchJobs(to_candid_JobFilter_n34(this._uploadFile, this._downloadFile, arg0));
+            return from_candid_vec_n8(this._uploadFile, this._downloadFile, result);
         }
     }
     async submitRating(arg0: Principal, arg1: bigint, arg2: string): Promise<void> {
@@ -587,6 +752,34 @@ export class Backend implements backendInterface {
             }
         } else {
             const result = await this.actor.submitRating(arg0, arg1, arg2);
+            return result;
+        }
+    }
+    async toggleAdActive(arg0: bigint, arg1: boolean): Promise<void> {
+        if (this.processError) {
+            try {
+                const result = await this.actor.toggleAdActive(arg0, arg1);
+                return result;
+            } catch (e) {
+                this.processError(e);
+                throw new Error("unreachable");
+            }
+        } else {
+            const result = await this.actor.toggleAdActive(arg0, arg1);
+            return result;
+        }
+    }
+    async updateAd(arg0: bigint, arg1: string, arg2: ExternalBlob, arg3: string, arg4: AdvertisementPlacement, arg5: bigint | null): Promise<void> {
+        if (this.processError) {
+            try {
+                const result = await this.actor.updateAd(arg0, arg1, await to_candid_ExternalBlob_n15(this._uploadFile, this._downloadFile, arg2), arg3, to_candid_AdvertisementPlacement_n16(this._uploadFile, this._downloadFile, arg4), to_candid_opt_n18(this._uploadFile, this._downloadFile, arg5));
+                return result;
+            } catch (e) {
+                this.processError(e);
+                throw new Error("unreachable");
+            }
+        } else {
+            const result = await this.actor.updateAd(arg0, arg1, await to_candid_ExternalBlob_n15(this._uploadFile, this._downloadFile, arg2), arg3, to_candid_AdvertisementPlacement_n16(this._uploadFile, this._downloadFile, arg4), to_candid_opt_n18(this._uploadFile, this._downloadFile, arg5));
             return result;
         }
     }
@@ -633,28 +826,49 @@ export class Backend implements backendInterface {
         }
     }
 }
-function from_candid_JobListing_n2(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: _JobListing): JobListing {
-    return from_candid_record_n3(_uploadFile, _downloadFile, value);
+function from_candid_AdvertisementPlacement_n25(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: _AdvertisementPlacement): AdvertisementPlacement {
+    return from_candid_variant_n26(_uploadFile, _downloadFile, value);
 }
-function from_candid_JobType_n4(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: _JobType): JobType {
-    return from_candid_variant_n5(_uploadFile, _downloadFile, value);
+async function from_candid_Advertisement_n22(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: _Advertisement): Promise<Advertisement> {
+    return await from_candid_record_n23(_uploadFile, _downloadFile, value);
 }
-function from_candid_UserRole_n11(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: _UserRole): UserRole {
+async function from_candid_ExternalBlob_n27(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: _ExternalBlob): Promise<ExternalBlob> {
+    return await _downloadFile(value);
+}
+function from_candid_JobListing_n9(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: _JobListing): JobListing {
+    return from_candid_record_n10(_uploadFile, _downloadFile, value);
+}
+function from_candid_JobType_n11(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: _JobType): JobType {
     return from_candid_variant_n12(_uploadFile, _downloadFile, value);
 }
-function from_candid_opt_n10(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: [] | [_UserProfile]): UserProfile | null {
+function from_candid_UserRole_n29(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: _UserRole): UserRole {
+    return from_candid_variant_n30(_uploadFile, _downloadFile, value);
+}
+function from_candid__CaffeineStorageRefillResult_n4(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: __CaffeineStorageRefillResult): _CaffeineStorageRefillResult {
+    return from_candid_record_n5(_uploadFile, _downloadFile, value);
+}
+function from_candid_opt_n24(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: [] | [bigint]): bigint | null {
     return value.length === 0 ? null : value[0];
 }
-function from_candid_opt_n13(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: [] | [_JobListing]): JobListing | null {
-    return value.length === 0 ? null : from_candid_JobListing_n2(_uploadFile, _downloadFile, value[0]);
-}
-function from_candid_opt_n14(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: [] | [_PosterProfile]): PosterProfile | null {
+function from_candid_opt_n28(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: [] | [_UserProfile]): UserProfile | null {
     return value.length === 0 ? null : value[0];
 }
-function from_candid_opt_n15(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: [] | [_SeekerProfile]): SeekerProfile | null {
+function from_candid_opt_n31(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: [] | [_JobListing]): JobListing | null {
+    return value.length === 0 ? null : from_candid_JobListing_n9(_uploadFile, _downloadFile, value[0]);
+}
+function from_candid_opt_n32(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: [] | [_PosterProfile]): PosterProfile | null {
     return value.length === 0 ? null : value[0];
 }
-function from_candid_record_n3(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: {
+function from_candid_opt_n33(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: [] | [_SeekerProfile]): SeekerProfile | null {
+    return value.length === 0 ? null : value[0];
+}
+function from_candid_opt_n6(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: [] | [boolean]): boolean | null {
+    return value.length === 0 ? null : value[0];
+}
+function from_candid_opt_n7(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: [] | [bigint]): bigint | null {
+    return value.length === 0 ? null : value[0];
+}
+function from_candid_record_n10(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: {
     id: bigint;
     pay: bigint;
     title: string;
@@ -683,23 +897,56 @@ function from_candid_record_n3(_uploadFile: (file: ExternalBlob) => Promise<Uint
         title: value.title,
         active: value.active,
         postedBy: value.postedBy,
-        jobType: from_candid_JobType_n4(_uploadFile, _downloadFile, value.jobType),
+        jobType: from_candid_JobType_n11(_uploadFile, _downloadFile, value.jobType),
         description: value.description,
         timestamp: value.timestamp,
         requiredSkills: value.requiredSkills,
         location: value.location
     };
 }
-function from_candid_variant_n12(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: {
-    admin: null;
-} | {
-    user: null;
-} | {
-    guest: null;
-}): UserRole {
-    return "admin" in value ? UserRole.admin : "user" in value ? UserRole.user : "guest" in value ? UserRole.guest : value;
+async function from_candid_record_n23(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: {
+    id: bigint;
+    title: string;
+    expiresAt: [] | [bigint];
+    linkUrl: string;
+    placement: _AdvertisementPlacement;
+    createdAt: bigint;
+    isActive: boolean;
+    image: _ExternalBlob;
+}): Promise<{
+    id: bigint;
+    title: string;
+    expiresAt?: bigint;
+    linkUrl: string;
+    placement: AdvertisementPlacement;
+    createdAt: bigint;
+    isActive: boolean;
+    image: ExternalBlob;
+}> {
+    return {
+        id: value.id,
+        title: value.title,
+        expiresAt: record_opt_to_undefined(from_candid_opt_n24(_uploadFile, _downloadFile, value.expiresAt)),
+        linkUrl: value.linkUrl,
+        placement: from_candid_AdvertisementPlacement_n25(_uploadFile, _downloadFile, value.placement),
+        createdAt: value.createdAt,
+        isActive: value.isActive,
+        image: await from_candid_ExternalBlob_n27(_uploadFile, _downloadFile, value.image)
+    };
 }
-function from_candid_variant_n5(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: {
+function from_candid_record_n5(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: {
+    success: [] | [boolean];
+    topped_up_amount: [] | [bigint];
+}): {
+    success?: boolean;
+    topped_up_amount?: bigint;
+} {
+    return {
+        success: record_opt_to_undefined(from_candid_opt_n6(_uploadFile, _downloadFile, value.success)),
+        topped_up_amount: record_opt_to_undefined(from_candid_opt_n7(_uploadFile, _downloadFile, value.topped_up_amount))
+    };
+}
+function from_candid_variant_n12(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: {
     nysc: null;
 } | {
     partTime: null;
@@ -712,19 +959,68 @@ function from_candid_variant_n5(_uploadFile: (file: ExternalBlob) => Promise<Uin
 }): JobType {
     return "nysc" in value ? JobType.nysc : "partTime" in value ? JobType.partTime : "fullTime" in value ? JobType.fullTime : "artisan" in value ? JobType.artisan : "shortTerm" in value ? JobType.shortTerm : value;
 }
-function from_candid_vec_n1(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: Array<_JobListing>): Array<JobListing> {
-    return value.map((x)=>from_candid_JobListing_n2(_uploadFile, _downloadFile, x));
+function from_candid_variant_n26(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: {
+    jobBoard: null;
+} | {
+    jobDetail: null;
+} | {
+    posterDashboard: null;
+} | {
+    seekerDashboard: null;
+} | {
+    landing: null;
+}): AdvertisementPlacement {
+    return "jobBoard" in value ? AdvertisementPlacement.jobBoard : "jobDetail" in value ? AdvertisementPlacement.jobDetail : "posterDashboard" in value ? AdvertisementPlacement.posterDashboard : "seekerDashboard" in value ? AdvertisementPlacement.seekerDashboard : "landing" in value ? AdvertisementPlacement.landing : value;
 }
-function to_candid_JobFilter_n16(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: JobFilter): _JobFilter {
-    return to_candid_record_n17(_uploadFile, _downloadFile, value);
+function from_candid_variant_n30(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: {
+    admin: null;
+} | {
+    user: null;
+} | {
+    guest: null;
+}): UserRole {
+    return "admin" in value ? UserRole.admin : "user" in value ? UserRole.user : "guest" in value ? UserRole.guest : value;
 }
-function to_candid_JobType_n8(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: JobType): _JobType {
-    return to_candid_variant_n9(_uploadFile, _downloadFile, value);
+async function from_candid_vec_n21(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: Array<_Advertisement>): Promise<Array<Advertisement>> {
+    return await Promise.all(value.map(async (x)=>await from_candid_Advertisement_n22(_uploadFile, _downloadFile, x)));
 }
-function to_candid_UserRole_n6(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: UserRole): _UserRole {
-    return to_candid_variant_n7(_uploadFile, _downloadFile, value);
+function from_candid_vec_n8(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: Array<_JobListing>): Array<JobListing> {
+    return value.map((x)=>from_candid_JobListing_n9(_uploadFile, _downloadFile, x));
 }
-function to_candid_record_n17(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: {
+function to_candid_AdvertisementPlacement_n16(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: AdvertisementPlacement): _AdvertisementPlacement {
+    return to_candid_variant_n17(_uploadFile, _downloadFile, value);
+}
+async function to_candid_ExternalBlob_n15(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: ExternalBlob): Promise<_ExternalBlob> {
+    return await _uploadFile(value);
+}
+function to_candid_JobFilter_n34(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: JobFilter): _JobFilter {
+    return to_candid_record_n35(_uploadFile, _downloadFile, value);
+}
+function to_candid_JobType_n19(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: JobType): _JobType {
+    return to_candid_variant_n20(_uploadFile, _downloadFile, value);
+}
+function to_candid_UserRole_n13(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: UserRole): _UserRole {
+    return to_candid_variant_n14(_uploadFile, _downloadFile, value);
+}
+function to_candid__CaffeineStorageRefillInformation_n2(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: _CaffeineStorageRefillInformation): __CaffeineStorageRefillInformation {
+    return to_candid_record_n3(_uploadFile, _downloadFile, value);
+}
+function to_candid_opt_n1(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: _CaffeineStorageRefillInformation | null): [] | [__CaffeineStorageRefillInformation] {
+    return value === null ? candid_none() : candid_some(to_candid__CaffeineStorageRefillInformation_n2(_uploadFile, _downloadFile, value));
+}
+function to_candid_opt_n18(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: bigint | null): [] | [bigint] {
+    return value === null ? candid_none() : candid_some(value);
+}
+function to_candid_record_n3(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: {
+    proposed_top_up_amount?: bigint;
+}): {
+    proposed_top_up_amount: [] | [bigint];
+} {
+    return {
+        proposed_top_up_amount: value.proposed_top_up_amount ? candid_some(value.proposed_top_up_amount) : candid_none()
+    };
+}
+function to_candid_record_n35(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: {
     jobType?: JobType;
     minPay?: bigint;
     keyword?: string;
@@ -740,7 +1036,7 @@ function to_candid_record_n17(_uploadFile: (file: ExternalBlob) => Promise<Uint8
     location: [] | [string];
 } {
     return {
-        jobType: value.jobType ? candid_some(to_candid_JobType_n8(_uploadFile, _downloadFile, value.jobType)) : candid_none(),
+        jobType: value.jobType ? candid_some(to_candid_JobType_n19(_uploadFile, _downloadFile, value.jobType)) : candid_none(),
         minPay: value.minPay ? candid_some(value.minPay) : candid_none(),
         keyword: value.keyword ? candid_some(value.keyword) : candid_none(),
         maxPay: value.maxPay ? candid_some(value.maxPay) : candid_none(),
@@ -748,7 +1044,7 @@ function to_candid_record_n17(_uploadFile: (file: ExternalBlob) => Promise<Uint8
         location: value.location ? candid_some(value.location) : candid_none()
     };
 }
-function to_candid_variant_n7(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: UserRole): {
+function to_candid_variant_n14(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: UserRole): {
     admin: null;
 } | {
     user: null;
@@ -763,7 +1059,30 @@ function to_candid_variant_n7(_uploadFile: (file: ExternalBlob) => Promise<Uint8
         guest: null
     } : value;
 }
-function to_candid_variant_n9(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: JobType): {
+function to_candid_variant_n17(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: AdvertisementPlacement): {
+    jobBoard: null;
+} | {
+    jobDetail: null;
+} | {
+    posterDashboard: null;
+} | {
+    seekerDashboard: null;
+} | {
+    landing: null;
+} {
+    return value == AdvertisementPlacement.jobBoard ? {
+        jobBoard: null
+    } : value == AdvertisementPlacement.jobDetail ? {
+        jobDetail: null
+    } : value == AdvertisementPlacement.posterDashboard ? {
+        posterDashboard: null
+    } : value == AdvertisementPlacement.seekerDashboard ? {
+        seekerDashboard: null
+    } : value == AdvertisementPlacement.landing ? {
+        landing: null
+    } : value;
+}
+function to_candid_variant_n20(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: JobType): {
     nysc: null;
 } | {
     partTime: null;

@@ -1,22 +1,25 @@
 import Array "mo:core/Array";
-import List "mo:core/List";
+import Time "mo:core/Time";
 import Map "mo:core/Map";
+import List "mo:core/List";
 import Nat "mo:core/Nat";
 import Text "mo:core/Text";
 import Iter "mo:core/Iter";
-import Time "mo:core/Time";
 import Order "mo:core/Order";
 import Float "mo:core/Float";
 import Runtime "mo:core/Runtime";
 import Principal "mo:core/Principal";
 
 import MixinAuthorization "authorization/MixinAuthorization";
+import MixinStorage "blob-storage/Mixin";
 import AccessControl "authorization/access-control";
-import Migration "migration";
+import Storage "blob-storage/Storage";
 
 // Open-Jobs
-(with migration = Migration.run)
+
 actor {
+  include MixinStorage();
+
   // Types
   public type UserProfile = {
     name : Text;
@@ -95,6 +98,25 @@ actor {
     jobType : ?JobType;
   };
 
+  public type AdvertisementPlacement = {
+    #jobBoard;
+    #jobDetail;
+    #seekerDashboard;
+    #posterDashboard;
+    #landing;
+  };
+
+  public type Advertisement = {
+    id : Nat;
+    title : Text;
+    image : Storage.ExternalBlob;
+    linkUrl : Text;
+    placement : AdvertisementPlacement;
+    isActive : Bool;
+    createdAt : Int;
+    expiresAt : ?Int;
+  };
+
   // State
   let userProfiles = Map.empty<Principal, UserProfile>();
   let seekerProfiles = Map.empty<Principal, SeekerProfile>();
@@ -102,8 +124,10 @@ actor {
   let jobListings = Map.empty<Nat, JobListing>();
   let applications = Map.empty<Nat, List.List<Application>>();
   let ratings = Map.empty<Principal, List.List<Rating>>();
+  let advertisements = Map.empty<Nat, Advertisement>();
 
   var jobCounter = 0;
+  var adCounter = 0;
 
   // Mixin authorization
   let accessControlState = AccessControl.initState();
@@ -567,5 +591,93 @@ actor {
       totalApplications;
       averageRating;
     };
+  };
+
+  // ─── Advertisement Management ──────────────────────────────────────────────
+
+  public shared ({ caller }) func createAd(
+    title : Text,
+    image : Storage.ExternalBlob,
+    linkUrl : Text,
+    placement : AdvertisementPlacement,
+    expiresAt : ?Int,
+  ) : async Nat {
+    if (not AccessControl.isAdmin(accessControlState, caller)) {
+      Runtime.trap("Only admins can create advertisements");
+    };
+    adCounter += 1;
+    let ad : Advertisement = {
+      id = adCounter;
+      title;
+      image;
+      linkUrl;
+      placement;
+      isActive = true;
+      createdAt = Time.now();
+      expiresAt;
+    };
+    advertisements.add(adCounter, ad);
+    adCounter;
+  };
+
+  public shared ({ caller }) func updateAd(
+    adId : Nat,
+    title : Text,
+    image : Storage.ExternalBlob,
+    linkUrl : Text,
+    placement : AdvertisementPlacement,
+    expiresAt : ?Int,
+  ) : async () {
+    if (not AccessControl.isAdmin(accessControlState, caller)) {
+      Runtime.trap("Only admins can update advertisements");
+    };
+    switch (advertisements.get(adId)) {
+      case (null) { Runtime.trap("Advertisement not found") };
+      case (?ad) {
+        let updated = {
+          ad with
+          title;
+          image;
+          linkUrl;
+          placement;
+          expiresAt;
+        };
+        advertisements.add(adId, updated);
+      };
+    };
+  };
+
+  public shared ({ caller }) func deleteAd(adId : Nat) : async () {
+    if (not AccessControl.isAdmin(accessControlState, caller)) {
+      Runtime.trap("Only admins can delete advertisements");
+    };
+    advertisements.remove(adId);
+  };
+
+  public shared ({ caller }) func toggleAdActive(adId : Nat, isActive : Bool) : async () {
+    if (not AccessControl.isAdmin(accessControlState, caller)) {
+      Runtime.trap("Only admins can toggle advertisement status");
+    };
+    switch (advertisements.get(adId)) {
+      case (null) { Runtime.trap("Advertisement not found") };
+      case (?ad) {
+        let updated = { ad with isActive };
+        advertisements.add(adId, updated);
+      };
+    };
+  };
+
+  public query func getAdsByPlacement(placement : AdvertisementPlacement) : async [Advertisement] {
+    let now = Time.now();
+    let allAds = advertisements.values().toArray();
+    allAds.filter(
+      func(ad) {
+        let notExpired = switch (ad.expiresAt) {
+          case (null) { true };
+          case (?expiry) { expiry > now };
+        };
+        ad.placement == placement and ad.isActive and notExpired;
+      }
+    );
   };
 };
